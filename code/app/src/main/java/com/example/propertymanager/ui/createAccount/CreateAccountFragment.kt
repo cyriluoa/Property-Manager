@@ -8,9 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.propertymanager.databinding.FragmentCreateAccountBinding
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
+import com.example.propertymanager.R
+import com.example.propertymanager.ui.image.ImageSharedViewModel
+import com.example.propertymanager.ui.image.UploadImageFragment
 
 @AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
@@ -19,6 +24,9 @@ class CreateAccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: CreateAccountViewModel by viewModels()
+
+    private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
+
 
 
     override fun onCreateView(
@@ -34,6 +42,17 @@ class CreateAccountFragment : Fragment() {
 
         binding.tvLogin.setOnClickListener {
             parentFragmentManager.popBackStack()
+        }
+
+        binding.ivAddPhoto.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, UploadImageFragment())
+                .addToBackStack(null)
+                .commit()
         }
 
         // Observe loading state
@@ -111,6 +130,14 @@ class CreateAccountFragment : Fragment() {
                 Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
             }
         }
+
+        imageSharedViewModel.profileImageUrl.observe(viewLifecycleOwner) { url ->
+            url?.let {
+                Glide.with(this).load(it).circleCrop().into(binding.ivProfilePicture)
+//                viewModel.setProfileImageUrl(it) // pass to your own ViewModel
+            }
+        }
+
     }
 
     override fun onDestroyView() {

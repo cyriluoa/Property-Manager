@@ -60,6 +60,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-functions-ktx")
     implementation("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0") // if using annotation features
+
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler) // for Hilt annotation processing
 }
