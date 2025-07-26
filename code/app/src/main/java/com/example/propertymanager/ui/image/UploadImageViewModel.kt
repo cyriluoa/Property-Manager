@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.math.max
 
 @HiltViewModel
 class UploadImageViewModel @Inject constructor(
@@ -24,12 +25,12 @@ class UploadImageViewModel @Inject constructor(
     private val _loading = MutableLiveData<Boolean>()
     val loading: LiveData<Boolean> = _loading
 
-    fun compressImageAndSet(uri: Uri, context: Context) {
+    fun compressImageAndSet(uri: Uri, context: Context,maxImageSize: Int) {
         _loading.value = true
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val compressedFile = imageRepository.compressImage(uri, context)
+                val compressedFile = imageRepository.compressImage(uri, context, maxImageSize)
                 compressedImageFile = compressedFile
                 withContext(Dispatchers.Main) {
                     _loading.value = false

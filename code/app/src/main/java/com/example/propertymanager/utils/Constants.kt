@@ -6,4 +6,6 @@ object Constants {
     const val USERNAMES_COLLECTION = "usernames"
     const val FIELD_EMAIL = "email"
 
+    const val MAX_PFP_SIZE = 256 * 1024
+
 }

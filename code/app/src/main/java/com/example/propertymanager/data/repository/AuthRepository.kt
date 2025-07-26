@@ -19,6 +19,7 @@ class AuthRepository @Inject constructor(
         username: String,
         email: String,
         password: String,
+        profileImageUrl: String?,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -29,7 +30,8 @@ class AuthRepository @Inject constructor(
                 val newUser = User(
                     fullName = fullName,
                     username = username,
-                    email = email
+                    email = email,
+                    photoUrl = profileImageUrl
                 )
                 userManager.createUserRecord(uid, newUser,
                     onSuccess = onSuccess,

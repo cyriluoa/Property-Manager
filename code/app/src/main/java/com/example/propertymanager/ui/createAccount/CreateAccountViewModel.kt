@@ -25,7 +25,7 @@ class CreateAccountViewModel @Inject constructor(
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    fun createAccount(fullName: String, username: String, email: String, password: String) {
+    fun createAccount(fullName: String, username: String, email: String, password: String, profileImageUrl: String?) {
         _loading.value = true
         _errorMessage.value = null
 
@@ -34,6 +34,7 @@ class CreateAccountViewModel @Inject constructor(
             username,
             email,
             password,
+            profileImageUrl,
             onSuccess = {
                 _loading.postValue(false)
                 _accountCreated.postValue(true)

@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class ImageManager @Inject constructor(): FirestoreManager (){
 
-    fun compressImage(uri: Uri, context: Context): File {
+    fun compressImage(uri: Uri, context: Context, maxImageSize: Int): File {
         val inputStream = context.contentResolver.openInputStream(uri)
             ?: throw Exception("Cannot open input stream from URI")
 
@@ -33,7 +33,7 @@ class ImageManager @Inject constructor(): FirestoreManager (){
             originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayStream)
             byteArray = byteArrayStream.toByteArray()
             quality -= 5
-        } while (byteArray.size > 256 * 1024 && quality > 10)
+        } while (byteArray.size > maxImageSize && quality > 10)
 
         outputStream.write(byteArray)
         outputStream.flush()

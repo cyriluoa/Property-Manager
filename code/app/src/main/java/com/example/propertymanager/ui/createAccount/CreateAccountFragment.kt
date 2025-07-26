@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.propertymanager.databinding.FragmentCreateAccountBinding
@@ -115,8 +116,10 @@ class CreateAccountFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.createAccount(name, username, email, password)
+            val profileImageUrl = imageSharedViewModel.profileImageUrl.value
+            viewModel.createAccount(name, username, email, password, profileImageUrl) // ✅ Pass it
         }
+
 
         viewModel.accountCreated.observe(viewLifecycleOwner) { success ->
             if (success) {
@@ -131,12 +134,36 @@ class CreateAccountFragment : Fragment() {
             }
         }
 
-        imageSharedViewModel.profileImageUrl.observe(viewLifecycleOwner) { url ->
-            url?.let {
-                Glide.with(this).load(it).circleCrop().into(binding.ivProfilePicture)
-//                viewModel.setProfileImageUrl(it) // pass to your own ViewModel
+        imageSharedViewModel.profileImageUri.observe(viewLifecycleOwner) { uri ->
+            if (uri != null) {
+                // Show local preview image
+                binding.ivProfilePicture.setPadding(0, 0, 0, 0)
+                binding.ivProfilePicture.clearColorFilter()
+
+                Glide.with(this)
+                    .load(uri)
+                    .circleCrop()
+                    .into(binding.ivProfilePicture)
+
+            } else {
+                // Fall back to download URL
+                imageSharedViewModel.profileImageUrl.value?.let { url ->
+                    binding.ivProfilePicture.setPadding(0, 0, 0, 0)
+                    binding.ivProfilePicture.clearColorFilter()
+
+                    Glide.with(this)
+                        .load(url)
+                        .into(binding.ivProfilePicture)
+                } ?: run {
+                    // Still nothing → show placeholder
+                    binding.ivProfilePicture.setImageResource(R.drawable.ic_person)
+                    binding.ivProfilePicture.setPadding(24, 24, 24, 24)
+                    binding.ivProfilePicture.setColorFilter(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+                }
             }
         }
+
+
 
     }
 

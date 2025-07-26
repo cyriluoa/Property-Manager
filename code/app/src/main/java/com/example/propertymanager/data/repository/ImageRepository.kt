@@ -11,8 +11,8 @@ import javax.inject.Singleton
 class ImageRepository @Inject constructor(
     private val imageManager: ImageManager
 ) {
-    fun compressImage(uri: Uri, context: Context): File {
-        return imageManager.compressImage(uri, context)
+    fun compressImage(uri: Uri, context: Context, maxImageSize: Int): File {
+        return imageManager.compressImage(uri, context, maxImageSize)
     }
 
     fun uploadImage(

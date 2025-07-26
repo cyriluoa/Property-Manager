@@ -180,7 +180,7 @@
                 android:padding="24dp"
                 android:elevation="8dp"
                 android:layout_marginBottom="20dp"
-                android:visibility="gone">
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -202,7 +202,8 @@
                         android:id="@+id/iv_image_preview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
+                        android:scaleType="fitCenter"
+                        android:visibility="gone"
                         android:background="@drawable/image_preview_bg"
                         android:adjustViewBounds="true" />
 
@@ -216,6 +217,7 @@
                         android:background="@drawable/image_preview_bg">
 
                         <ImageView
+                            android:id="@+id/iv_image"
                             android:layout_width="80dp"
                             android:layout_height="80dp"
                             android:src="@drawable/ic_person"
@@ -268,16 +270,6 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">
-
-                    <TextView
-                        android:id="@+id/tv_image_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="image_name.jpg"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/text_primary"
-                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:id="@+id/tv_image_size"

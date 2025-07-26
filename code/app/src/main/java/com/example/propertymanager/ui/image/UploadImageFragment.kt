@@ -1,28 +1,27 @@
 package com.example.propertymanager.ui.image
 
-
-
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.propertymanager.databinding.FragmentUploadImageBinding
+import com.example.propertymanager.utils.Constants
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.ByteArrayOutputStream
+import java.io.File
+import java.text.DecimalFormat
 
 @AndroidEntryPoint
 class UploadImageFragment : Fragment() {
@@ -31,33 +30,24 @@ class UploadImageFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: UploadImageViewModel by viewModels()
-
-    private var selectedImageUri: Uri? = null
-
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
 
+    private var selectedImageUri: Uri? = null
+    private lateinit var cameraImageUri: Uri
 
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                selectedImageUri = it
-                Glide.with(this).load(it).circleCrop().into(binding.ivImagePreview)
-                viewModel.compressImageAndSet(it, requireContext())
+                setSelectedImage(it)
+                viewModel.compressImageAndSet(it, requireContext(), Constants.MAX_PFP_SIZE)
             }
         }
 
     private val cameraLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val bitmap = result.data?.extras?.get("data") as? Bitmap
-                bitmap?.let {
-                    binding.llPreviewContainer.visibility = View.VISIBLE
-                    val uri = bitmapToUri(it)
-                    selectedImageUri = uri
-                    Glide.with(this).load(uri).circleCrop().into(binding.ivImagePreview)
-
-                    viewModel.compressImageAndSet(uri, requireContext())
-                }
+        registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                setSelectedImage(cameraImageUri)
+                viewModel.compressImageAndSet(cameraImageUri, requireContext(), Constants.MAX_PFP_SIZE)
             }
         }
 
@@ -73,12 +63,10 @@ class UploadImageFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnCamera.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(), Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED
             ) {
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                cameraLauncher.launch(intent)
+                launchCamera()
             } else {
                 requestPermissions(arrayOf(Manifest.permission.CAMERA), 100)
             }
@@ -89,31 +77,99 @@ class UploadImageFragment : Fragment() {
         }
 
         binding.btnConfirm.setOnClickListener {
-            viewModel.uploadCompressedImage(
-                onSuccess = { url ->
-                    Toast.makeText(requireContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show()
-                    imageSharedViewModel.setProfileImageUrl(url)
+            selectedImageUri?.let {
+                viewModel.uploadCompressedImage(
+                    onSuccess = { url ->
+                        if (isAdded) {
+                            Toast.makeText(requireContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show()
+                            imageSharedViewModel.setProfileImageUrl(url)
+                            selectedImageUri?.let { uri ->
+                                imageSharedViewModel.setProfileImageUri(uri)
+                            }
 
-                    // You will pass this URL back to CreateAccountFragment via ViewModel or SavedStateHandle
-                    parentFragmentManager.popBackStack()
-                },
-                onFailure = { e ->
-                    Toast.makeText(requireContext(), "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            )
+                            parentFragmentManager.popBackStack()
+                        }
+                    },
+                    onFailure = { e ->
+                        if (isAdded) {
+                            Toast.makeText(requireContext(), "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+            } ?: Toast.makeText(requireContext(), "Please select an image first", Toast.LENGTH_SHORT).show()
+        }
+
+
+        binding.btnCancel.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
+        binding.btnRemoveImage.setOnClickListener {
+            resetImageSelection()
+        }
+
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.btnConfirm.isEnabled = !isLoading
+            binding.btnCamera.isEnabled = !isLoading
+            binding.btnGallery.isEnabled = !isLoading
+            binding.btnRemoveImage.isEnabled = !isLoading
+        }
+
+    }
+
+    private fun setSelectedImage(uri: Uri) {
+        selectedImageUri = uri
+        binding.btnConfirm.isEnabled = true
+
+        binding.llNoImagePlaceholder.visibility = View.GONE
+        binding.ivImagePreview.visibility = View.VISIBLE
+        binding.llImageDetails.visibility = View.VISIBLE
+
+        Glide.with(this)
+            .load(uri)
+            .into(binding.ivImagePreview)
+
+        binding.tvImageSize.text = "Size: ${getFileSizeInKB(requireContext(),uri)} KB"
+    }
+
+    private fun getFileSizeInKB(context: Context, uri: Uri): String {
+        return try {
+            val cursor = context.contentResolver.query(uri, null, null, null, null)
+            val sizeIndex = cursor?.getColumnIndex(android.provider.OpenableColumns.SIZE) ?: -1
+            cursor?.moveToFirst()
+            val sizeInBytes = if (sizeIndex != -1) cursor?.getLong(sizeIndex) ?: 0L else 0L
+            cursor?.close()
+
+            val sizeInKB = sizeInBytes / 1024.0
+            DecimalFormat("#.##").format(sizeInKB)
+        } catch (e: Exception) {
+            "?"
         }
     }
 
-    private fun bitmapToUri(bitmap: Bitmap): Uri {
-        val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(
-            requireActivity().contentResolver,
-            bitmap,
-            "temp_image",
-            null
+
+    private fun resetImageSelection() {
+        selectedImageUri = null
+        binding.btnConfirm.isEnabled = false
+        binding.llNoImagePlaceholder.visibility = View.VISIBLE
+        binding.ivImagePreview.visibility = View.GONE
+        binding.llImageDetails.visibility = View.GONE
+    }
+
+    private fun launchCamera() {
+        val imageFile = createImageFile()
+        cameraImageUri = FileProvider.getUriForFile(
+            requireContext(),
+            "${requireContext().packageName}.fileprovider",
+            imageFile
         )
-        return Uri.parse(path)
+        cameraLauncher.launch(cameraImageUri)
+    }
+
+    private fun createImageFile(): File {
+        val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("IMG_${System.currentTimeMillis()}", ".jpg", storageDir)
     }
 
     override fun onDestroyView() {
