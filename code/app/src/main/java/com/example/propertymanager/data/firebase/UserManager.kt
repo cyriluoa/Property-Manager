@@ -62,5 +62,43 @@ class UserManager @Inject constructor() : FirestoreManager() {
             }
     }
 
+    fun getCurrentUserInformation(
+        onSuccess: (User) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val uid = auth.currentUser?.uid
+        if (uid.isNullOrEmpty()) {
+            onFailure(Exception("User not logged in"))
+            return
+        }
+
+        db.collection(Constants.USERS_COLLECTION)
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists()) {
+                    val user = doc.toObject(User::class.java)
+                    if (user != null) {
+                        onSuccess(user)
+                    } else {
+                        onFailure(Exception("User data is null"))
+                    }
+                } else {
+                    onFailure(Exception("User document not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+    fun signOutUser() {
+        auth.signOut()
+    }
+
+
+
+
+
 
 }
