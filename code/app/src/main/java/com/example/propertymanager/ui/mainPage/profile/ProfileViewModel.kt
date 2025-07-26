@@ -19,10 +19,15 @@ class ProfileViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    private var hasLoaded = false // ✅ Caching flag
+
     fun loadUserData() {
+        if (hasLoaded) return // ✅ Prevent multiple fetches
+
         userRepository.getCurrentUserInfo(
             onSuccess = {
                 _user.postValue(it)
+                hasLoaded = true
             },
             onFailure = {
                 _error.postValue(it.message)
@@ -32,6 +37,8 @@ class ProfileViewModel @Inject constructor(
 
     fun signOut() {
         userRepository.signOut()
+        _user.value = null
+        hasLoaded = false // Optional: reset so it can refetch after sign in again
     }
-
 }
+
