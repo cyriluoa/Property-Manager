@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.fragment.app.viewModels
 import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentLoginBinding
 import com.example.propertymanager.ui.createAccount.CreateAccountFragment
+import com.example.propertymanager.ui.mainPage.main.MainPageActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -60,7 +62,10 @@ class LoginFragment : Fragment() {
         viewModel.loginSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Toast.makeText(requireContext(), "Login successful!", Toast.LENGTH_SHORT).show()
-                // TODO: Navigate to dashboard
+                val intent = Intent(requireContext(), MainPageActivity::class.java)
+                intent.putExtra("openProfileTab", false) // Go to Properties tab by default
+                startActivity(intent)
+                requireActivity().finish()
             }
         }
 

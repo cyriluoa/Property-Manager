@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.createAccount
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.example.propertymanager.R
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.image.UploadImageFragment
+import com.example.propertymanager.ui.mainPage.main.MainPageActivity
 
 @AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
@@ -124,7 +126,11 @@ class CreateAccountFragment : Fragment() {
         viewModel.accountCreated.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Toast.makeText(requireContext(), "Account created successfully", Toast.LENGTH_SHORT).show()
-                parentFragmentManager.popBackStack()
+                val intent = Intent(requireContext(), MainPageActivity::class.java)
+                intent.putExtra("openProfileTab", true) // ✅ Go to profile tab after account creation
+                startActivity(intent)
+                requireActivity().finish()
+
             }
         }
 
