@@ -39,13 +39,20 @@ class ProfileFragment : Fragment() {
         profileViewModel.loadUserData()
 
         profileViewModel.user.observe(viewLifecycleOwner) { user ->
+            if (user == null) {
+                // Optional: Clear UI if needed
+                binding.tvFullName.text = ""
+                binding.tvUsername.text = ""
+                binding.ivProfilePicture.setImageResource(R.drawable.ic_white_person)
+                binding.ivProfilePicture.setPadding(24, 24, 24, 24)
+                return@observe
+            }
+
             binding.tvFullName.text = user.fullName
             binding.tvUsername.text = user.username
 
             if (!user.photoUrl.isNullOrEmpty()) {
                 binding.ivProfilePicture.setPadding(0, 0, 0, 0)
-
-
                 Glide.with(this)
                     .load(user.photoUrl)
                     .placeholder(R.drawable.ic_gallery)
@@ -55,10 +62,9 @@ class ProfileFragment : Fragment() {
             } else {
                 binding.ivProfilePicture.setImageResource(R.drawable.ic_white_person)
                 binding.ivProfilePicture.setPadding(24, 24, 24, 24)
-
             }
-
         }
+
 
         profileViewModel.error.observe(viewLifecycleOwner) { errorMsg ->
             errorMsg?.let {

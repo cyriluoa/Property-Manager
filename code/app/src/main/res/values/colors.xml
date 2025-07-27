@@ -6,6 +6,13 @@
     <color name="medium_blue">#578FCA</color>
     <color name="primary_blue">#3674B5</color>
 
+    <!-- Red Theme Colors -->
+    <color name="background_light_red">#FFF2E4</color>
+    <color name="accent_light_red">#F9A1A1</color> <!-- soft red like A1E3F9 -->
+    <color name="medium_red">#CA5757</color>       <!-- matches contrast to 578FCA -->
+    <color name="primary_red">#B53636</color>      <!-- matches contrast to 3674B5 -->
+
+
     <!-- Additional Colors -->
     <color name="white">#FFFFFF</color>
     <color name="text_primary">#2C3E50</color>

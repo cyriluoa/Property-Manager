@@ -23,21 +23,25 @@ class MainPageActivity : AppCompatActivity() {
     private val paymentsFragment by lazy { PaymentsFragment() }
     private val profileFragment by lazy { ProfileFragment() }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // First-time add the initial fragment
         val openProfileTab = intent.getBooleanExtra("openProfileTab", false)
         val initialFragment = if (openProfileTab) profileFragment else propertiesFragment
+        currentTab = if (openProfileTab) MainPageTabs.PROFILE else MainPageTabs.PROPERTIES
+        activeFragment = initialFragment
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.main_fragment_container, initialFragment)
+            .add(R.id.main_fragment_container, propertiesFragment)
+            .hide(propertiesFragment)
+            .add(R.id.main_fragment_container, paymentsFragment)
+            .hide(paymentsFragment)
+            .add(R.id.main_fragment_container, profileFragment)
+            .hide(profileFragment)
+            .show(initialFragment)
             .commit()
-        activeFragment = initialFragment
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -57,7 +61,6 @@ class MainPageActivity : AppCompatActivity() {
             }
         }
 
-        // Set selected item initially
         binding.bottomNav.selectedItemId = if (openProfileTab) R.id.nav_profile else R.id.nav_properties
     }
 
@@ -81,17 +84,11 @@ class MainPageActivity : AppCompatActivity() {
         transaction.setCustomAnimations(enterAnim, exitAnim)
 
         activeFragment?.let { transaction.hide(it) }
-
-        if (!targetFragment.isAdded) {
-            transaction.add(R.id.main_fragment_container, targetFragment)
-        } else {
-            transaction.show(targetFragment)
-        }
+        transaction.show(targetFragment)
 
         transaction.commit()
         activeFragment = targetFragment
         currentTab = targetTab
     }
-
-
 }
+
