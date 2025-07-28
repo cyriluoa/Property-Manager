@@ -2,6 +2,7 @@ package com.example.propertymanager.ui.mainPage.properties.yourProperties.add
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +13,12 @@ import com.example.propertymanager.R
 import com.example.propertymanager.data.model.OverdueItem
 import com.example.propertymanager.databinding.DialogOverdueInputBinding
 import com.example.propertymanager.databinding.FragmentAddPropertyBinding
+import com.example.propertymanager.ui.image.ImageSharedViewModel
+import com.example.propertymanager.ui.image.UploadImageFragment
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.SharedPropertyViewModel
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.overdue.OverdueItemAdapter
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.searchClients.SearchClientsFragment
+import com.example.propertymanager.utils.Constants
 import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
@@ -28,6 +32,8 @@ class AddPropertyFragment : Fragment() {
     private val binding get() = _binding!!
     private val sharedViewModel: SharedPropertyViewModel by activityViewModels()
     private var selectedStartDate: LocalDate? = null
+
+    private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,6 +68,25 @@ class AddPropertyFragment : Fragment() {
                 adapter.submitList(overdueItems.toList())
             }
         }
+
+        binding.btnCamera.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, UploadImageFragment.newInstance(Constants.PATH_PROPERTIES))
+                .addToBackStack(null)
+                .commit()
+        }
+
+        imageSharedViewModel.imageUrl.observe(viewLifecycleOwner){url ->
+            Log.d("URL", url.toString())
+            binding.btnCamera.visibility = View.GONE
+            binding.tvImageStatus.text = "Image Uploaded successfully"
+
+        }
+
 
     }
 

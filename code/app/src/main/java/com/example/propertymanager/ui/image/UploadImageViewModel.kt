@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.math.max
 
 @HiltViewModel
 class UploadImageViewModel @Inject constructor(
@@ -45,6 +44,7 @@ class UploadImageViewModel @Inject constructor(
     }
 
     fun uploadCompressedImage(
+        imagePath: String?,
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
@@ -53,10 +53,17 @@ class UploadImageViewModel @Inject constructor(
             onFailure(Exception("No image selected"))
             return
         }
+        if(imagePath == null){
+            onFailure(Exception("No path given"))
+            return
+        }
+        val path = imagePath
 
         _loading.value = true
 
-        imageRepository.uploadImage(file,
+        imageRepository.uploadImage(
+            path = path,
+            file = file,
             onSuccess = { downloadUrl ->
                 _loading.value = false
                 onSuccess(downloadUrl)

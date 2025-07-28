@@ -10,23 +10,23 @@ import jakarta.inject.Inject
 @HiltViewModel
 class ImageSharedViewModel @Inject constructor() : ViewModel() {
 
-    private val _profileImageUri = MutableLiveData<Uri?>()
-    val profileImageUri: LiveData<Uri?> = _profileImageUri
+    private val _imageUri = MutableLiveData<Uri?>()
+    val imageUri: LiveData<Uri?> = _imageUri
 
-    private val _profileImageUrl = MutableLiveData<String?>()
-    val profileImageUrl: LiveData<String?> = _profileImageUrl
+    private val _imageUrl = MutableLiveData<String?>()
+    val imageUrl: LiveData<String?> = _imageUrl
 
-    fun setProfileImageUri(uri: Uri) {
-        _profileImageUri.value = uri
+    fun setImageUri(uri: Uri) {
+        _imageUri.value = uri
     }
 
-    fun setProfileImageUrl(url: String) {
-        _profileImageUrl.value = url
+    fun setImageUrl(url: String) {
+        _imageUrl.value = url
     }
 
     fun clear() {
-        _profileImageUri.value = null
-        _profileImageUrl.value = null
+        _imageUri.value = null
+        _imageUrl.value = null
     }
 }
 

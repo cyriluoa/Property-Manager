@@ -35,6 +35,22 @@ class UploadImageFragment : Fragment() {
     private var selectedImageUri: Uri? = null
     private lateinit var cameraImageUri: Uri
 
+
+    private var imagePath: String? = null
+
+    companion object {
+        private const val ARG_IMAGE_PATH = "arg_image_path"
+
+        fun newInstance(path: String): UploadImageFragment {
+            val fragment = UploadImageFragment()
+            val args = Bundle()
+            args.putString(ARG_IMAGE_PATH, path)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
@@ -62,6 +78,9 @@ class UploadImageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        imagePath = arguments?.getString(ARG_IMAGE_PATH)
+
+
         binding.btnCamera.setOnClickListener {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED
@@ -79,12 +98,13 @@ class UploadImageFragment : Fragment() {
         binding.btnConfirm.setOnClickListener {
             selectedImageUri?.let {
                 viewModel.uploadCompressedImage(
+                    imagePath = imagePath,
                     onSuccess = { url ->
                         if (isAdded) {
                             Toast.makeText(requireContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show()
-                            imageSharedViewModel.setProfileImageUrl(url)
+                            imageSharedViewModel.setImageUrl(url)
                             selectedImageUri?.let { uri ->
-                                imageSharedViewModel.setProfileImageUri(uri)
+                                imageSharedViewModel.setImageUri(uri)
                             }
 
                             parentFragmentManager.popBackStack()

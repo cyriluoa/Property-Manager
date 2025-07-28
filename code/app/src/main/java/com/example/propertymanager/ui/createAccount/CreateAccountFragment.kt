@@ -19,6 +19,7 @@ import com.example.propertymanager.R
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.image.UploadImageFragment
 import com.example.propertymanager.ui.mainPage.main.MainPageActivity
+import com.example.propertymanager.utils.Constants
 
 @AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
@@ -53,7 +54,7 @@ class CreateAccountFragment : Fragment() {
                     R.anim.slide_in_right, R.anim.slide_out_left,
                     R.anim.slide_in_left, R.anim.slide_out_right
                 )
-                .replace(R.id.fragment_container, UploadImageFragment())
+                .replace(R.id.fragment_container, UploadImageFragment.newInstance(Constants.PATH_PROFILE_PICTURES))
                 .addToBackStack(null)
                 .commit()
         }
@@ -118,7 +119,7 @@ class CreateAccountFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val profileImageUrl = imageSharedViewModel.profileImageUrl.value
+            val profileImageUrl = imageSharedViewModel.imageUrl.value
             viewModel.createAccount(name, username, email, password, profileImageUrl) // ✅ Pass it
         }
 
@@ -140,7 +141,7 @@ class CreateAccountFragment : Fragment() {
             }
         }
 
-        imageSharedViewModel.profileImageUri.observe(viewLifecycleOwner) { uri ->
+        imageSharedViewModel.imageUri.observe(viewLifecycleOwner) { uri ->
             if (uri != null) {
                 // Show local preview image
                 binding.ivProfilePicture.setPadding(0, 0, 0, 0)
@@ -153,12 +154,13 @@ class CreateAccountFragment : Fragment() {
 
             } else {
                 // Fall back to download URL
-                imageSharedViewModel.profileImageUrl.value?.let { url ->
+                imageSharedViewModel.imageUrl.value?.let { url ->
                     binding.ivProfilePicture.setPadding(0, 0, 0, 0)
                     binding.ivProfilePicture.clearColorFilter()
 
                     Glide.with(this)
                         .load(url)
+                        .circleCrop()
                         .into(binding.ivProfilePicture)
                 } ?: run {
                     // Still nothing → show placeholder

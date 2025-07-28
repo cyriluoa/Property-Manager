@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import jakarta.inject.Inject
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -44,11 +45,12 @@ class ImageManager @Inject constructor(): FirestoreManager (){
 
     fun uploadImageToFirebaseStorage(
         file: File,
+        path: String,
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         val storageRef = storage.reference
-        val fileRef = storageRef.child("profile_pictures/${UUID.randomUUID()}.jpg")
+        val fileRef = storageRef.child("${path}/${UUID.randomUUID()}.jpg")
 
         fileRef.putFile(Uri.fromFile(file))
             .addOnSuccessListener {

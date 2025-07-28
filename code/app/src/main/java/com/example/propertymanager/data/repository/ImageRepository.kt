@@ -17,9 +17,10 @@ class ImageRepository @Inject constructor(
 
     fun uploadImage(
         file: File,
+        path: String,
         onSuccess: (String) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        imageManager.uploadImageToFirebaseStorage(file, onSuccess, onFailure)
+        imageManager.uploadImageToFirebaseStorage(file, path, onSuccess, onFailure)
     }
 }

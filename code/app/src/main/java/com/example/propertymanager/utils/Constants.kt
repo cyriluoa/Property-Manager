@@ -8,4 +8,7 @@ object Constants {
 
     const val MAX_PFP_SIZE = 256 * 1024
 
+    const val PATH_PROFILE_PICTURES = "profile_pictures"
+
+    const val PATH_PROPERTIES = "properties"
 }
