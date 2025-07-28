@@ -1,0 +1,47 @@
+package com.example.propertymanager.ui.mainPage.properties.yourProperties
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.propertymanager.R
+import com.example.propertymanager.databinding.FragmentPropertyListBinding
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
+class PropertyListFragment : Fragment() {
+
+    private var _binding: FragmentPropertyListBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPropertyListBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.fabAddProperty.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, AddPropertyFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        // TODO: Setup RecyclerView for property list
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.propertymanager.databinding.FragmentPropertiesBinding
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.YourPropertiesActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -26,10 +27,10 @@ class PropertiesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        binding.cardYourProperties.setOnClickListener {
-//            startActivity(Intent(requireContext(), YourPropertiesActivity::class.java))
-//        }
-//
+        binding.cardYourProperties.setOnClickListener {
+            startActivity(Intent(requireContext(), YourPropertiesActivity::class.java))
+        }
+
 //        binding.cardYourTenants.setOnClickListener {
 //            startActivity(Intent(requireContext(), YourTenantsActivity::class.java))
 //        }

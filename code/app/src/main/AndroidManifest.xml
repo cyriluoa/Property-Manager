@@ -43,6 +43,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.mainPage.main.MainPageActivity"/>
+        <activity android:name=".ui.mainPage.properties.yourProperties.YourPropertiesActivity"/>
     </application>
 
 </manifest>

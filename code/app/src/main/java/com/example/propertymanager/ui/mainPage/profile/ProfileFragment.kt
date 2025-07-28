@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentProfileBinding
 import com.example.propertymanager.main.MainActivity
+import com.example.propertymanager.sharedPrefs.Prefs
 import com.example.propertymanager.ui.mainPage.main.MainPageActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -73,6 +74,8 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnSignOut.setOnClickListener {
+            Prefs.setRememberMe(requireContext(), false)
+            Prefs.saveUsername(requireContext(), "")
             profileViewModel.signOut()
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
