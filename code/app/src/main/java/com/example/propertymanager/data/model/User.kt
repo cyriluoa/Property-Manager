@@ -3,6 +3,7 @@ package com.example.propertymanager.data.model
 import com.google.firebase.Timestamp
 
 data class User(
+    val uid: String = "",
     val fullName: String = "",
     val username: String = "",
     val email: String = "",

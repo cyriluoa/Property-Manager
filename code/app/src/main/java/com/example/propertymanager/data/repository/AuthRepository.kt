@@ -28,6 +28,7 @@ class AuthRepository @Inject constructor(
             password,
             onSuccess = { uid ->
                 val newUser = User(
+                    uid = uid,
                     fullName = fullName,
                     username = username,
                     email = email,

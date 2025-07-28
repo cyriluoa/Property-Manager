@@ -20,4 +20,11 @@ class UserRepository @Inject constructor(
         userManager.signOutUser()
     }
 
+    fun getAllUsers(
+        onSuccess: (List<User>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        userManager.getAllUsers(onSuccess, onFailure)
+    }
+
 }

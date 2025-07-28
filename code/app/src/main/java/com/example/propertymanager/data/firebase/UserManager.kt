@@ -92,6 +92,25 @@ class UserManager @Inject constructor() : FirestoreManager() {
             }
     }
 
+    fun getAllUsers(
+        onSuccess: (List<User>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val currentUid = auth.currentUser?.uid
+        db.collection(Constants.USERS_COLLECTION)
+            .get()
+            .addOnSuccessListener { result ->
+                val users = result.documents
+                    .mapNotNull { it.toObject(User::class.java) }
+                    .filter { it.uid != currentUid } // ✅ Filter out current user
+                onSuccess(users)
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+
     fun signOutUser() {
         auth.signOut()
     }

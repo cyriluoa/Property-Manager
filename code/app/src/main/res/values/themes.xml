@@ -59,4 +59,29 @@
         <item name="android:textColor">@color/primary_blue</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <style name="DatePickerTheme" parent="ThemeOverlay.Material3.MaterialCalendar">
+        <item name="materialCalendarTheme">@style/CustomCalendar</item>
+    </style>
+
+
+    <style name="CustomCalendar" parent="Widget.Material3.MaterialCalendar">
+        <!-- Selected day circle and top bar background -->
+        <item name="colorPrimary">@color/primary_blue</item>
+
+        <!-- Text color inside selected day circle -->
+        <item name="colorOnPrimary">@color/white</item>
+
+        <!-- Background of calendar container -->
+        <item name="colorSurface">@color/card_background</item>
+
+        <!-- Text of dates -->
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Accent colors (range fill, etc.) -->
+        <item name="colorSecondary">@color/medium_blue</item>
+
+    </style>
+
+
 </resources>
