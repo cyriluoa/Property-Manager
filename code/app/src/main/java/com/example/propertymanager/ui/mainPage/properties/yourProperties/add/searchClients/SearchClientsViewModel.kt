@@ -1,4 +1,4 @@
-package com.example.propertymanager.ui.mainPage.properties.yourProperties.searchClients
+package com.example.propertymanager.ui.mainPage.properties.yourProperties.add.searchClients
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

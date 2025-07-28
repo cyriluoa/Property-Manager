@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentPropertyListBinding
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.AddPropertyFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

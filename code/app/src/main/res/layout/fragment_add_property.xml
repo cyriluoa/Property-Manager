@@ -275,39 +275,55 @@
                     app:rippleColor="@android:color/transparent"
                     android:foreground="@android:color/transparent">
 
-
-
-
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical">
+                        android:orientation="vertical">
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_payment"
-                            app:tint="@color/text_secondary" />
 
-                        <TextView
-                            android:id="@+id/tv_add_overdue"
-                            android:layout_width="0dp"
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="Add Overdue Amount(s)"
-                            android:textColor="@color/text_primary"
-                            android:textSize="16sp" />
+                            android:orientation="horizontal"
+                            android:padding="16dp"
+                            android:gravity="center_vertical">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_add"
-                            app:tint="@color/primary_blue" />
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_payment"
+                                app:tint="@color/text_secondary" />
+
+                            <TextView
+                                android:id="@+id/tv_add_overdue"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:text="Add Overdue Amount(s)"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_add"
+                                app:tint="@color/primary_blue" />
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_overdue_items"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            android:nestedScrollingEnabled="false"
+                            android:layout_marginTop="8dp" />
+
                     </LinearLayout>
+
+
+
                 </com.google.android.material.card.MaterialCardView>
 
 
