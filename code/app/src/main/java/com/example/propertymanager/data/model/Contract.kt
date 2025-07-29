@@ -1,16 +1,21 @@
 package com.example.propertymanager.data.model
 
+import android.os.Parcelable
 import com.google.firebase.Timestamp
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class Contract(
     val id: String = "",
     val clientId: String = "",
     val startDate: Timestamp? = null,
     val contractLengthMonths: Int = 0,
-    val monthlyRentBreakdown: Map<String, Double> = emptyMap(), // "2025-08" to amount
-    val preContractOverdueAmounts: Map<String, Double> = emptyMap(),       // "Deposit" to amount
+    val monthlyRentBreakdown: List<RentBreakdown> = emptyList(),
+    val preContractOverdueAmounts: List<OverdueItem> = emptyList(),
     val isActive: Boolean = true,
     val createdAt: Timestamp? = null,
-    val notes: String? = null
-)
+    val hasClientAccepted: Boolean = false,
+    val notes: String = ""
+) : Parcelable
+
 

@@ -6,16 +6,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.propertymanager.R
+import com.example.propertymanager.data.firebase.FirestoreManager
+import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.OverdueItem
+import com.example.propertymanager.data.model.Property
+import com.example.propertymanager.data.model.RentBreakdown
 import com.example.propertymanager.databinding.DialogOverdueInputBinding
 import com.example.propertymanager.databinding.FragmentAddPropertyBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.image.UploadImageFragment
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.SharedPropertyViewModel
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.breakdown.AddPropertyDraftFragment
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.overdue.OverdueItemAdapter
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.searchClients.SearchClientsFragment
 import com.example.propertymanager.utils.Constants
@@ -87,6 +93,63 @@ class AddPropertyFragment : Fragment() {
 
         }
 
+        binding.seeBreakdown.setOnClickListener {
+            if (!validateInputs()) return@setOnClickListener
+            val firestoreManager = FirestoreManager()
+
+            val propertyName = binding.etPropertyName.text.toString().trim()
+            val contractLength = binding.etRentStartDate.text.toString().trim().toInt()
+            val rentAmount = binding.etMonthlyRent.text.toString().trim().toDouble()
+            val imageUrl = imageSharedViewModel.imageUrl.value
+            val clientId = sharedViewModel.selectedClient?.uid ?: return@setOnClickListener
+            val clientName = sharedViewModel.selectedClient?.username ?: return@setOnClickListener
+
+            val ownerId = firestoreManager.getCurrentUserUid() ?: return@setOnClickListener
+
+            // Create rent breakdown
+            val rentBreakdown = mutableListOf<RentBreakdown>()
+            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+            var date = selectedStartDate!!
+            for (i in 0 until contractLength) {
+                val year = date.year + (date.monthValue - 1 + i) / 12
+                val month = (date.monthValue - 1 + i) % 12 + 1
+                val day = date.dayOfMonth
+
+                val targetDate = try {
+                    LocalDate.of(year, month, day)
+                } catch (e: Exception) {
+                    LocalDate.of(year, month, 1).plusMonths(1).minusDays(1) // Last day of month
+                }
+
+                rentBreakdown.add(RentBreakdown(targetDate.format(formatter), rentAmount))
+            }
+
+            val property = Property(
+                name = propertyName,
+                ownerId = ownerId,
+                imageUrl = imageUrl
+            )
+
+            val contract = Contract(
+                clientId = clientId,
+                contractLengthMonths = contractLength,
+                monthlyRentBreakdown = rentBreakdown,
+                preContractOverdueAmounts = overdueItems
+            )
+
+            val nextFragment = AddPropertyDraftFragment.newInstance(property, contract, clientName)
+
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, nextFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+
 
     }
 
@@ -154,14 +217,20 @@ class AddPropertyFragment : Fragment() {
 
         binding.btnAdd.setOnClickListener {
             val label = binding.etOverdueLabel.text?.toString()?.trim()
-            val amount = binding.etOverdueAmount.text?.toString()?.trim()
+            val amountText = binding.etOverdueAmount.text?.toString()?.trim()
 
             if (label.isNullOrEmpty()) {
                 binding.etOverdueLabel.error = "Enter label"
                 return@setOnClickListener
             }
-            if (amount.isNullOrEmpty()) {
+            if (amountText.isNullOrEmpty()) {
                 binding.etOverdueAmount.error = "Enter amount"
+                return@setOnClickListener
+            }
+
+            val amount = amountText.toDoubleOrNull()
+            if (amount == null) {
+                binding.etOverdueAmount.error = "Enter a valid number"
                 return@setOnClickListener
             }
 
@@ -170,6 +239,55 @@ class AddPropertyFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun validateInputs(): Boolean {
+
+        val propertyName = binding.etPropertyName.text?.toString()?.trim()
+        val contractStartText = binding.etContractStart.text?.toString()?.trim()
+        val monthsText = binding.etRentStartDate.text?.toString()?.trim()
+        val clientName = binding.etClientSearch.text?.toString()?.trim()
+        val rentText = binding.etMonthlyRent.text?.toString()?.trim()
+
+        // Property Name
+        if (propertyName.isNullOrEmpty()) {
+            Toast.makeText(requireContext(),"Property name cannot be empty", Toast.LENGTH_SHORT ).show()
+            return false
+        }
+
+        // Start Date
+        val today = LocalDate.now()
+        if (selectedStartDate == null) {
+            Toast.makeText(requireContext(), "Select contract start date", Toast.LENGTH_SHORT ).show()
+            return false
+        } else if (!selectedStartDate!!.isAfter(today)) {
+            Toast.makeText(requireContext(), "Start date must be after today", Toast.LENGTH_SHORT ).show()
+            return false
+        }
+
+        // Contract Length
+        val months = monthsText?.toIntOrNull()
+        if (months == null || months < 1) {
+            Toast.makeText(requireContext(),"Enter valid contract length (min 1 month)", Toast.LENGTH_SHORT ).show()
+            return false
+        }
+
+        // Client Name
+        if (clientName.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Please select a client", Toast.LENGTH_SHORT ).show()
+            return false
+        }
+
+        // Rent Amount
+        val rent = rentText?.toDoubleOrNull()
+        if (rent == null || rent <= 0) {
+            Toast.makeText(requireContext(),"Enter a valid rent amount", Toast.LENGTH_SHORT ).show()
+            return false
+        }
+
+        return true
     }
 
 

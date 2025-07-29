@@ -64,29 +64,24 @@
                         android:padding="20dp"
                         android:background="@drawable/property_card_background">
 
-                        <!-- Property Title with Icon -->
+                        <!-- Section Header -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
-                            android:layout_marginBottom="12dp">
+                            android:layout_marginBottom="16dp"
+                            android:padding="12dp"
+                            android:background="@drawable/section_header_background">
+
 
                             <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="🏠"
-                                android:textSize="20sp"
-                                android:layout_marginEnd="8dp" />
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="Property Details"
-                                android:textSize="16sp"
+                                android:textSize="18sp"
                                 android:textStyle="bold"
-                                android:textColor="@color/primary_blue" />
+                                android:textColor="@color/white" />
 
                         </LinearLayout>
 
@@ -109,11 +104,23 @@
                             android:textColor="@color/medium_blue"
                             android:layout_marginBottom="12dp" />
 
+                        <TextView
+                            android:id="@+id/tv_property_client"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Client Name"
+                            android:textSize="16sp"
+                            android:textColor="@color/medium_blue"
+                            android:layout_marginBottom="12dp" />
+
+
+
                         <ImageView
                             android:id="@+id/iv_property_image"
                             android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            android:scaleType="centerCrop"
+                            android:layout_marginTop="20dp"
+                            android:layout_height="300dp"
+                            android:scaleType="fitCenter"
                             android:visibility="gone"
                             android:contentDescription="Property Image"
                             android:background="@color/light_gray"
@@ -150,12 +157,6 @@
                             android:padding="12dp"
                             android:background="@drawable/section_header_background">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="📋"
-                                android:textSize="18sp"
-                                android:layout_marginEnd="8dp" />
 
                             <TextView
                                 android:layout_width="match_parent"
@@ -195,6 +196,53 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp"
+                    app:strokeColor="@color/accent_light_blue"
+                    app:strokeWidth="2dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <!-- Section Header -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="16dp"
+                            android:padding="12dp"
+                            android:background="@drawable/section_header_background">
+
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Monthly Rent Breakdown"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/white" />
+
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_rent_breakdown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Notes Section Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginBottom="32dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
@@ -218,27 +266,58 @@
                             android:padding="12dp"
                             android:background="@drawable/section_header_background">
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="💰"
-                                android:textSize="18sp"
-                                android:layout_marginEnd="8dp" />
 
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Monthly Rent Breakdown"
+                                android:text="Additional Notes"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
                                 android:textColor="@color/white" />
 
                         </LinearLayout>
 
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_rent_breakdown"
+                        <!-- Notes Input Area -->
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Add any additional notes or comments"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginBottom="8dp" />
+
+                            <EditText
+                                android:id="@+id/et_notes"
+                                android:layout_width="match_parent"
+                                android:layout_height="120dp"
+                                android:hint="Enter notes here..."
+                                android:textSize="16sp"
+                                android:textColor="@color/text_primary"
+                                android:textColorHint="@color/text_secondary"
+                                android:background="@drawable/notes_input_background"
+                                android:padding="12dp"
+                                android:gravity="top|start"
+                                android:inputType="textMultiLine|textCapSentences"
+                                android:maxLength="500"
+                                android:scrollbars="vertical" />
+
+                            <!-- Character Counter -->
+                            <TextView
+                                android:id="@+id/tv_character_count"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:text="0/500"
+                                android:textSize="12sp"
+                                android:textColor="@color/text_secondary"
+                                android:layout_marginTop="4dp" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 

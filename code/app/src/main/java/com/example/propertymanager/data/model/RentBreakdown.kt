@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class OverdueItem(
-    val label: String,
-    val amount: Double
+data class RentBreakdown(
+    var dueDate: String = "", // Format:dd-MM-yyyy
+    var amount: Double = 0.0
 ) : Parcelable

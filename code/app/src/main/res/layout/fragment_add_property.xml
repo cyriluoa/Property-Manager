@@ -335,7 +335,6 @@
                     android:id="@+id/see_breakdown"
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
-                    android:enabled="false"
                     android:text="View breakdown"
                     android:textColor="@color/white"
                     android:textSize="16sp"

@@ -65,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Enter date"
                     android:textSize="16sp"
+                    android:focusable="false"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_secondary"
                     android:background="@null"

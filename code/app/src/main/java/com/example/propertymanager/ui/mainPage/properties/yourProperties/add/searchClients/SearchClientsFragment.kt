@@ -55,6 +55,9 @@ class SearchClientsFragment : Fragment() {
                 parentFragmentManager.popBackStack()
             }
         }
+        binding.btnCancel.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
 
         viewModel.filteredUsers.observe(viewLifecycleOwner) { users ->
             adapter.submitList(users)

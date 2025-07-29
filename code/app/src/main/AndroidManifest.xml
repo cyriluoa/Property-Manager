@@ -43,7 +43,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.mainPage.main.MainPageActivity"/>
-        <activity android:name=".ui.mainPage.properties.yourProperties.YourPropertiesActivity"/>
+        <activity
+            android:name=".ui.mainPage.properties.yourProperties.YourPropertiesActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:exported="true" />
     </application>
 
 </manifest>

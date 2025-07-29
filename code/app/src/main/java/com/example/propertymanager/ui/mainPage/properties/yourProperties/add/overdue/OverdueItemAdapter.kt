@@ -18,7 +18,9 @@ class OverdueItemAdapter(
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: OverdueItem) {
             binding.tvOverdueLabel.text = item.label
-            binding.tvOverdueAmount.text = "$${item.amount}"
+            val formattedAmount = String.format("%.2f", item.amount)
+            binding.tvOverdueAmount.text = "$$formattedAmount"
+
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(item)
             }

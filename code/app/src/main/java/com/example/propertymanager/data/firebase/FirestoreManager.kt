@@ -12,4 +12,8 @@ open class FirestoreManager {
     protected val auth =  FirebaseAuth.getInstance()
 
     protected val storage = FirebaseStorage.getInstance()
+
+    fun getCurrentUserUid(): String?{
+        return auth.currentUser?.uid
+    }
 }
