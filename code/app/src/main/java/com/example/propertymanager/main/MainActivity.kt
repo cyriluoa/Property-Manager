@@ -1,10 +1,15 @@
 package com.example.propertymanager.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.propertymanager.R
@@ -25,11 +30,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val user = FirebaseAuth.getInstance().currentUser
-        val rememberMe = Prefs.getRememberMe(this)
 
-        if (user != null || rememberMe) {
-            // User is already logged in and opted for remember me
+        requestNotificationPermission()
+
+
+        val user = FirebaseAuth.getInstance().currentUser
+//        Log.d("User",user.toString())
+
+
+        if (user != null) {
+            // User is already logged in
             startActivity(Intent(this, MainPageActivity::class.java))
             finish()
         } else if (savedInstanceState == null) {
@@ -40,6 +50,7 @@ class MainActivity : AppCompatActivity() {
                 .replace(binding.fragmentContainer.id, LoginFragment())
                 .commit()
         }
+
     }
 
 
@@ -51,4 +62,23 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    NOTIFICATION_PERMISSION_REQUEST_CODE
+                )
+            }
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
+    }
+
 }

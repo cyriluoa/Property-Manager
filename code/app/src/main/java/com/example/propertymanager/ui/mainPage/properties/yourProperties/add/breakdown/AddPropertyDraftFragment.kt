@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.propertymanager.data.model.Contract
@@ -24,6 +25,9 @@ class AddPropertyDraftFragment : Fragment() {
     private lateinit var clientName: String
     private lateinit var rentBreakdownAdapter: RentBreakdownAdapter
     private lateinit var overdueAdapter: OverdueBreakdownAdapter
+
+    private val viewModel: AddPropertyDraftViewModel by viewModels()
+
     companion object {
         fun newInstance(property: Property, contract: Contract, clientName: String) =
             AddPropertyDraftFragment().apply {
@@ -60,6 +64,12 @@ class AddPropertyDraftFragment : Fragment() {
         setupNoteListeners()
         setupAdapters()
 
+        // 👇 Fetch and observe owner's username
+        viewModel.ownerUsername.observe(viewLifecycleOwner) { username ->
+            binding.tvPropertyOwner.text = username
+        }
+        viewModel.fetchOwnerUsername(property.ownerId)
+
         binding.btnCancel.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -75,16 +85,15 @@ class AddPropertyDraftFragment : Fragment() {
                 monthlyRentBreakdown = updatedRentBreakdown
             )
 
-            Log.d("Updated Contract",updatedContract.toString())
+            Log.d("Updated Contract", updatedContract.toString())
 
             // TODO: Push updatedContract + property to Firestore
         }
-
     }
+
 
     private fun setupPropertyCard() {
         binding.tvPropertyName.text = property.name
-        binding.tvPropertyOwner.text = property.ownerId
         binding.tvPropertyClient.text = clientName
 
         if (!property.imageUrl.isNullOrEmpty()) {

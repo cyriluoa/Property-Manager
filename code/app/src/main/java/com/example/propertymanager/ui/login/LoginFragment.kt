@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentLoginBinding
-import com.example.propertymanager.sharedPrefs.Prefs
 import com.example.propertymanager.ui.createAccount.CreateAccountFragment
 import com.example.propertymanager.ui.mainPage.main.MainPageActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,11 +32,9 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val savedUsername = Prefs.getSavedUsername(requireContext())
-        if (!savedUsername.isNullOrEmpty()) {
-            binding.etUsername.setText(savedUsername)
-            binding.cbRememberMe.isChecked = Prefs.getRememberMe(requireContext())
-        }
+
+
+
 
         binding.tvCreateAccount.setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -53,14 +50,6 @@ class LoginFragment : Fragment() {
         binding.btnLogin.setOnClickListener {
             val username = binding.etUsername.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
-            val rememberMe = binding.cbRememberMe.isChecked
-
-            if (rememberMe) {
-                Prefs.setRememberMe(requireContext(), true)
-                Prefs.saveUsername(requireContext(), username)
-            } else {
-                Prefs.setRememberMe(requireContext(), false)
-            }
             viewModel.login(username, password)
 
         }

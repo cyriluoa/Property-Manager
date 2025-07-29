@@ -1,8 +1,10 @@
 package com.example.propertymanager.data.firebase
 
 
+import android.util.Log
 import com.example.propertymanager.data.model.User
 import com.example.propertymanager.utils.Constants
+import com.google.firebase.firestore.FieldValue
 import jakarta.inject.Inject
 import javax.inject.Singleton
 
@@ -25,6 +27,30 @@ class UserManager @Inject constructor() : FirestoreManager() {
             onFailure(e)
         }
     }
+
+    fun getUsernameByUid(
+        uid: String,
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection(Constants.USERS_COLLECTION)
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val username = document.getString("username") ?: "Unknown"
+                    onSuccess(username)
+                } else {
+                    onFailure(Exception("User not found"))
+                }
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+
+
 
     fun isUsernameAvailable(
         username: String,
@@ -110,9 +136,37 @@ class UserManager @Inject constructor() : FirestoreManager() {
             }
     }
 
+    fun addFcmToken(
+        uid: String,
+        token: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val userRef = db.collection(Constants.USERS_COLLECTION).document(uid)
+        userRef.update("fcmTokens", FieldValue.arrayUnion(token))
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    fun removeFcmToken(
+        uid: String,
+        token: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val userRef = db.collection(Constants.USERS_COLLECTION).document(uid)
+        userRef.update("fcmTokens", FieldValue.arrayRemove(token))
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
+
 
     fun signOutUser() {
         auth.signOut()
+        val user = auth.currentUser
+        Log.d("signOutUser",user.toString())
     }
 
 

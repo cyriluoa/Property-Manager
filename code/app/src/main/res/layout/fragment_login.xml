@@ -144,27 +144,11 @@
                     android:gravity="center_vertical"
                     android:layout_marginBottom="32dp">
 
-                    <CheckBox
-                        android:id="@+id/cb_remember_me"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/primary_blue"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Remember me"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
-
                     <TextView
                         android:id="@+id/tv_forgot_password"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Forgot Password?"
-                        android:visibility="gone"
                         android:textColor="@color/primary_blue"
                         android:textSize="14sp"
                         android:clickable="true"

@@ -1,3 +1,5 @@
+const { onDocumentCreated } = require("firebase-functions/firestore");
+const { logger } = require("firebase-functions");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
@@ -5,7 +7,8 @@ admin.initializeApp();
 
 // 1. Delete user by UID
 exports.deleteUserByUid = functions.https.onCall(async (request) => {
-    const { uid } = request.data || {};
+    const data = typeof request === "object" && request.data ? request.data : request;
+    const { uid } = data || {};
 
     if (!uid) {
         throw new functions.https.HttpsError(
@@ -26,7 +29,8 @@ exports.deleteUserByUid = functions.https.onCall(async (request) => {
 
 // 2. Create user via Admin SDK (no session change)
 exports.createUserWithEmail = functions.https.onCall(async (request) => {
-    const { email, password } = request.data || {};
+    const data = typeof request === "object" && request.data ? request.data : request;
+    const { email, password } = data || {};
 
     if (!email || !password) {
         throw new functions.https.HttpsError("invalid-argument", "Email and password are required.");
@@ -39,6 +43,83 @@ exports.createUserWithEmail = functions.https.onCall(async (request) => {
     } catch (error) {
         console.error("Failed to create user:", error);
         throw new functions.https.HttpsError("internal", "User creation failed.", error);
+    }
+});
+
+exports.notifyClientOnRequest = onDocumentCreated("client_requests/{requestId}", async (event) => {
+    logger.log("New client request detected.");
+
+    const requestData = event.data.data();
+    logger.log("Request data:", requestData);
+
+    const clientId = requestData.clientId;
+    const ownerName = requestData.ownerName || "An owner";
+    const propertyName = requestData.propertyName || "a property";
+
+    if (!clientId) {
+        logger.error("Missing clientId in request.");
+        return;
+    }
+
+    logger.log(`Fetching FCM tokens for clientId: ${clientId}`);
+
+    const clientDoc = await admin.firestore().collection("users").doc(clientId).get();
+    const clientData = clientDoc.data();
+
+    if (!clientData || !clientData.fcmTokens) {
+        logger.warn(`No client data or FCM tokens for user ${clientId}. Skipping notification.`);
+        return;
+    }
+
+    const tokens = clientData.fcmTokens;
+    logger.log("Tokens found:", tokens);
+
+    if (tokens.length === 0) {
+        logger.warn(`No FCM tokens found for user ${clientId}. Skipping notification.`);
+        return;
+    }
+
+    const payload = {
+        notification: {
+            title: "Client Request Received",
+            body: `${ownerName} invited you to join "${propertyName}".`,
+        },
+        data: {
+            requestId: event.params.requestId,
+            type: "client_request",
+        },
+    };
+
+    const invalidTokens = [];
+
+    const messaging = admin.messaging();
+
+    for (const token of tokens) {
+        try {
+            const res = await messaging.send({
+                token,
+                notification: {
+                    title: "Client Request Received",
+                    body: `${ownerName} invited you to join "${propertyName}".`,
+                },
+                data: {
+                    requestId: event.params.requestId,
+                    type: "client_request",
+                },
+            });
+            logger.log(`Notification sent to token: ${token}. Response: ${res}`);
+        } catch (err) {
+            logger.error(`Error sending to token ${token}:`, err);
+            invalidTokens.push(token);
+        }
+    }
+
+
+    if (invalidTokens.length > 0) {
+        logger.log("Removing invalid tokens:", invalidTokens);
+        await admin.firestore().collection("users").doc(clientId).update({
+            fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens),
+        });
     }
 });
 

@@ -74,13 +74,19 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnSignOut.setOnClickListener {
-            Prefs.setRememberMe(requireContext(), false)
-            Prefs.saveUsername(requireContext(), "")
-            profileViewModel.signOut()
-            val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
+            profileViewModel.signOut(
+                onSuccess = {
+                    val intent = Intent(requireContext(), MainActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+                },
+                onFailure = { error ->
+                    Toast.makeText(requireContext(), "Logout failed: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+            )
         }
+
+
     }
 
     override fun onDestroyView() {

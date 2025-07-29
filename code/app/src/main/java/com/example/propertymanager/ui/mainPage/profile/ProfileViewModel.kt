@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.mainPage.profile
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,10 +36,23 @@ class ProfileViewModel @Inject constructor(
         )
     }
 
-    fun signOut() {
-        userRepository.signOut()
-        _user.value = null
-        hasLoaded = false // Optional: reset so it can refetch after sign in again
+    fun signOut(
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        userRepository.signOut(
+            onSuccess = {
+                _user.value = null
+                hasLoaded = false
+                onSuccess()
+            },
+            onFailure = { error ->
+                Log.e("SignOut", "Error signing out: ${error.message}")
+                onFailure(error)
+            }
+        )
     }
+
+
 }
 
