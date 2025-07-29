@@ -2,6 +2,7 @@ package com.example.propertymanager.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
         val rememberMe = Prefs.getRememberMe(this)
 
-        if (user != null && rememberMe) {
+        if (user != null || rememberMe) {
             // User is already logged in and opted for remember me
             startActivity(Intent(this, MainPageActivity::class.java))
             finish()
