@@ -8,11 +8,9 @@ data class Contract(
     val startDate: Timestamp? = null,
     val contractLengthMonths: Int = 0,
     val monthlyRentBreakdown: Map<String, Double> = emptyMap(), // "2025-08" to amount
-    val overdueAmounts: Map<String, Double> = emptyMap(),       // "Deposit" to amount
+    val preContractOverdueAmounts: Map<String, Double> = emptyMap(),       // "Deposit" to amount
     val isActive: Boolean = true,
     val createdAt: Timestamp? = null,
-    val totalPaidRent: Double = 0.0,
-    val totalPaidOverdue: Double = 0.0,
     val notes: String? = null
 )
 

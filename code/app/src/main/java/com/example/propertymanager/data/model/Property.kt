@@ -10,5 +10,4 @@ data class Property(
     val currentContractId: String? = null,
     val createdAt: Timestamp? = null,
     val updatedAt: Timestamp? = null,
-    val location: String? = null
 )
