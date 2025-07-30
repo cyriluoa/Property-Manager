@@ -5,16 +5,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.example.propertymanager.data.model.ClientRequest
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.Property
 import com.example.propertymanager.databinding.FragmentAddPropertyDraftBinding
+import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.UUID
 
 @AndroidEntryPoint
 class AddPropertyDraftFragment : Fragment() {
@@ -27,6 +32,8 @@ class AddPropertyDraftFragment : Fragment() {
     private lateinit var overdueAdapter: OverdueBreakdownAdapter
 
     private val viewModel: AddPropertyDraftViewModel by viewModels()
+
+    private val sharedImageViewModel: ImageSharedViewModel by activityViewModels()
 
     companion object {
         fun newInstance(property: Property, contract: Contract, clientName: String) =
@@ -70,6 +77,25 @@ class AddPropertyDraftFragment : Fragment() {
         }
         viewModel.fetchOwnerUsername(property.ownerId)
 
+        // 🔁 Observers for UI feedback
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.btnConfirm.isEnabled = !isLoading
+        }
+
+        viewModel.successMessage.observe(viewLifecycleOwner) { msg ->
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            sharedImageViewModel.clear()
+            parentFragmentManager.popBackStack()
+            parentFragmentManager.popBackStack()
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errMsg ->
+            sharedImageViewModel.clear()
+            Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
+        }
+
+
         binding.btnCancel.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
@@ -78,23 +104,57 @@ class AddPropertyDraftFragment : Fragment() {
             val notes = binding.etNotes.text?.toString()?.trim() ?: ""
             val updatedRentBreakdown = rentBreakdownAdapter.getUpdatedList()
 
-            val updatedContract = contract.copy(
+            // Generate IDs
+            val propertyId = UUID.randomUUID().toString()
+            val contractId = UUID.randomUUID().toString()
+            val clientRequestId = UUID.randomUUID().toString()
+
+            // Add timestamp + id to contract
+            val finalContract = contract.copy(
+                id = contractId,
                 notes = notes,
                 createdAt = Timestamp.now(),
-                startDate = contract.startDate ?: Timestamp.now(),
                 monthlyRentBreakdown = updatedRentBreakdown
             )
 
-            Log.d("Updated Contract", updatedContract.toString())
+            // Add contract id to property
+            val finalProperty = property.copy(
+                id = propertyId,
+                currentContractId = contractId,
+                createdAt = Timestamp.now(),
+                updatedAt = Timestamp.now()
+            )
 
-            // TODO: Push updatedContract + property to Firestore
+            // Set up client request (ownerName can be observed from ViewModel)
+            val ownerName = viewModel.ownerUsername.value ?: "Unknown"
+            val clientRequest = ClientRequest(
+                id = clientRequestId,
+                clientId = finalContract.clientId,
+                ownerId = finalProperty.ownerId,
+                propertyId = propertyId,
+                contractId = contractId,
+                ownerName = ownerName,
+                propertyName = finalProperty.name
+            )
+
+            // ✅ Now pass these 3 objects to your ViewModel
+            viewModel.submitPropertyWithContractAndRequest(
+                finalProperty,
+                finalContract,
+                clientRequest
+            )
+
+            Log.d("Submit", "Property: $finalProperty")
+            Log.d("Submit", "Contract: $finalContract")
+            Log.d("Submit", "ClientRequest: $clientRequest")
         }
+
     }
 
 
     private fun setupPropertyCard() {
-        binding.tvPropertyName.text = property.name
-        binding.tvPropertyClient.text = clientName
+        binding.tvPropertyName.text = "Owner: " + property.name
+        binding.tvPropertyClient.text = "Client: " + clientName
 
         if (!property.imageUrl.isNullOrEmpty()) {
             binding.ivPropertyImage.visibility = View.VISIBLE

@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ClientRequest(
+    val id: String = "",
     val clientId: String = "",
     val ownerId: String = "",
     val propertyId: String = "",

@@ -125,6 +125,7 @@ class AddPropertyFragment : Fragment() {
             }
 
             val property = Property(
+
                 name = propertyName,
                 ownerId = ownerId,
                 imageUrl = imageUrl
