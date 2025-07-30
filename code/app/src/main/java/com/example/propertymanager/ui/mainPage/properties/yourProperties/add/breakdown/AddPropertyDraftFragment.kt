@@ -33,7 +33,7 @@ class AddPropertyDraftFragment : Fragment() {
 
     private val viewModel: AddPropertyDraftViewModel by viewModels()
 
-    private val sharedImageViewModel: ImageSharedViewModel by activityViewModels()
+
 
     companion object {
         fun newInstance(property: Property, contract: Contract, clientName: String) =
@@ -85,13 +85,11 @@ class AddPropertyDraftFragment : Fragment() {
 
         viewModel.successMessage.observe(viewLifecycleOwner) { msg ->
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-            sharedImageViewModel.clear()
             parentFragmentManager.popBackStack()
             parentFragmentManager.popBackStack()
         }
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { errMsg ->
-            sharedImageViewModel.clear()
             Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
         }
 

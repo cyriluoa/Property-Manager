@@ -41,6 +41,8 @@ class AddPropertyFragment : Fragment() {
 
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
 
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -52,7 +54,6 @@ class AddPropertyFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupDatePicker()
         setupClientSearch()
         updateSelectedClient()
@@ -86,12 +87,19 @@ class AddPropertyFragment : Fragment() {
                 .commit()
         }
 
-        imageSharedViewModel.imageUrl.observe(viewLifecycleOwner){url ->
-            Log.d("URL", url.toString())
-            binding.btnCamera.visibility = View.GONE
-            binding.tvImageStatus.text = "Image Uploaded successfully"
-
+        imageSharedViewModel.imageUrl.observe(viewLifecycleOwner) { url ->
+            Log.d("URL outside if", url.toString())
+            if (!url.isNullOrEmpty()) {
+                Log.d("URL", url.toString())
+                binding.btnCamera.visibility = View.GONE
+                binding.tvImageStatus.text = "Image Uploaded successfully"
+            } else {
+                // Optional: reset UI if there's no image
+                binding.btnCamera.visibility = View.VISIBLE
+                binding.tvImageStatus.text = "Upload Image"
+            }
         }
+
 
         binding.seeBreakdown.setOnClickListener {
             if (!validateInputs()) return@setOnClickListener
