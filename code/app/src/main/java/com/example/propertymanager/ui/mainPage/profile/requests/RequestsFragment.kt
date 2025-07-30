@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.propertymanager.data.model.ClientRequest
+import androidx.fragment.app.viewModels
 import com.example.propertymanager.databinding.FragmentRequestsBinding
 import com.example.propertymanager.ui.mainPage.requests.ClientRequestAdapter
-import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -18,6 +18,7 @@ class RequestsFragment : Fragment() {
     private var _binding: FragmentRequestsBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: RequestsViewModel by viewModels()
     private lateinit var adapter: ClientRequestAdapter
 
     override fun onCreateView(
@@ -33,42 +34,37 @@ class RequestsFragment : Fragment() {
 
         adapter = ClientRequestAdapter { request ->
             Toast.makeText(requireContext(), "Clicked: ${request.propertyName}", Toast.LENGTH_SHORT).show()
-            // TODO: navigate to contract details later
         }
 
         binding.rvRequests.adapter = adapter
 
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserId != null) {
+            viewModel.startListening(currentUserId)
+        }
 
-        val dummyRequests = listOf(
-            ClientRequest(
-                id = "r1",
-                clientId = "client123",
-                ownerId = "owner456",
-                propertyId = "prop1",
-                contractId = "con1",
-                ownerName = "John Smith",
-                propertyName = "Luxury Villa Downtown",
-                timestamp = Timestamp.now()
-            ),
-            ClientRequest(
-                id = "r2",
-                clientId = "client789",
-                ownerId = "owner123",
-                propertyId = "prop2",
-                contractId = "con2",
-                ownerName = "Alice Johnson",
-                propertyName = "Cozy Cottage East",
-                status = "accepted",
-                timestamp = Timestamp.now()
-            )
-        )
+        viewModel.requests.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
-        adapter.submitList(dummyRequests)
+        viewModel.pendingCount.observe(viewLifecycleOwner) {
+            binding.tvPendingCount.text = it.toString()
+        }
+
+        viewModel.acceptedCount.observe(viewLifecycleOwner) {
+            binding.tvAcceptedCount.text = it.toString()
+        }
+
+        viewModel.deniedCount.observe(viewLifecycleOwner) {
+            binding.tvDeniedCount.text = it.toString()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        viewModel.stopListening()
     }
 }
+
 

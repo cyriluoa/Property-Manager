@@ -23,16 +23,43 @@
                 android:paddingTop="40dp"
                 android:paddingBottom="32dp">
 
-                <!-- Main Heading -->
-                <TextView
+                <!-- Header with Back Button -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Breakdown"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:gravity="center"
-                    android:elevation="2dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageButton
+                        android:id="@+id/btn_back"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/ic_arrow_back"
+                        android:contentDescription="Back"
+                        android:visibility="gone"
+                        app:tint="@color/white" />
+
+                    <!-- Main Heading -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Breakdown"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:gravity="center"
+                        android:elevation="2dp" />
+
+                    <!-- Spacer to balance the back button -->
+                    <View
+                        android:id="@+id/space_balancer"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -323,15 +350,16 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Action Buttons -->
+                <!-- Original Action Buttons (Confirm/Cancel) -->
                 <LinearLayout
+                    android:id="@+id/layout_confirm_cancel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center"
-                    android:layout_marginTop="24dp"
                     android:layout_marginBottom="32dp"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="visible">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_cancel"
@@ -361,6 +389,47 @@
                         android:textStyle="bold"
                         android:layout_marginStart="12dp"
                         android:backgroundTint="@color/primary_blue"
+                        app:cornerRadius="28dp"
+                        app:elevation="4dp" />
+
+                </LinearLayout>
+
+                <!-- New Action Buttons (Accept/Deny) -->
+                <LinearLayout
+                    android:id="@+id/layout_accept_deny"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_deny"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:text="Deny"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="12dp"
+                        android:backgroundTint="@color/error_red"
+                        app:cornerRadius="28dp"
+                        app:elevation="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_accept"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:text="Accept"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="12dp"
+                        android:backgroundTint="@color/success_green"
                         app:cornerRadius="28dp"
                         app:elevation="4dp" />
 

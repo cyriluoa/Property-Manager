@@ -70,6 +70,7 @@
                         android:gravity="center">
 
                         <TextView
+                            android:id="@+id/tv_pending_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="2"
@@ -105,6 +106,7 @@
                         android:gravity="center">
 
                         <TextView
+                            android:id="@+id/tv_accepted_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="3"
@@ -140,6 +142,7 @@
                         android:gravity="center">
 
                         <TextView
+                            android:id="@+id/tv_denied_count"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="1"
