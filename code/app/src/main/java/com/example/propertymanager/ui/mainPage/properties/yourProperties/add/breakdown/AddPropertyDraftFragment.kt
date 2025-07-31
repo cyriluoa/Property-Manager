@@ -71,7 +71,7 @@ class AddPropertyDraftFragment : Fragment() {
 
         // 👇 Fetch and observe owner's username
         viewModel.ownerUsername.observe(viewLifecycleOwner) { username ->
-            binding.tvPropertyOwner.text = username
+            binding.tvPropertyOwner.text ="Owner " + username
         }
         viewModel.fetchOwnerUsername(property.ownerId)
 
@@ -149,7 +149,7 @@ class AddPropertyDraftFragment : Fragment() {
 
 
     private fun setupPropertyCard() {
-        binding.tvPropertyName.text = "Owner: " + property.name
+        binding.tvPropertyName.text =  property.name
         binding.tvPropertyClient.text = "Client: " + clientName
 
         if (!property.imageUrl.isNullOrEmpty()) {

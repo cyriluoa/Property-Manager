@@ -1,4 +1,4 @@
-const { onDocumentCreated } = require("firebase-functions/firestore");
+const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/firestore");
 const { logger } = require("firebase-functions");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -123,3 +123,78 @@ exports.notifyClientOnRequest = onDocumentCreated("client_requests/{requestId}",
     }
 });
 
+
+// 4. Notify owner when status changes to accepted/denied
+exports.notifyOwnerOnStatusChange = onDocumentUpdated("client_requests/{requestId}", async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+
+    if (!before || !after) {
+        logger.warn("Missing document data before or after update.");
+        return;
+    }
+
+    const statusChanged = before.status === "pending" &&
+        (after.status === "accepted" || after.status === "denied");
+
+    if (!statusChanged) {
+        logger.log("Status didn't change from pending to accepted/denied. Skipping notification.");
+        return;
+    }
+
+    const { clientId, ownerId, propertyName, status } = after;
+
+    if (!clientId || !ownerId) {
+        logger.error("Missing clientId or ownerId in request.");
+        return;
+    }
+
+    const clientDoc = await admin.firestore().collection("users").doc(clientId).get();
+    const clientData = clientDoc.data();
+    const clientUsername = clientData?.username || "A client";
+
+    const ownerDoc = await admin.firestore().collection("users").doc(ownerId).get();
+    const ownerData = ownerDoc.data();
+    const tokens = ownerData?.fcmTokens;
+
+    if (!tokens || tokens.length === 0) {
+        logger.warn(`No FCM tokens for owner ${ownerId}. Skipping notification.`);
+        return;
+    }
+
+    const payload = {
+        notification: {
+            title: "Request Status Updated",
+            body: `${clientUsername} ${status} your request for "${propertyName}".`,
+        },
+        data: {
+            requestId: event.params.requestId,
+            type: "status_update",
+            status,
+        },
+    };
+
+    const messaging = admin.messaging();
+    const invalidTokens = [];
+
+    for (const token of tokens) {
+        try {
+            const res = await messaging.send({
+                token,
+                notification: payload.notification,
+                data: payload.data,
+            });
+            logger.log(`Notification sent to token ${token}: ${res}`);
+        } catch (err) {
+            logger.error(`Error sending to token ${token}:`, err);
+            invalidTokens.push(token);
+        }
+    }
+
+    if (invalidTokens.length > 0) {
+        logger.log("Removing invalid tokens from owner's record:", invalidTokens);
+        await admin.firestore().collection("users").doc(ownerId).update({
+            fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens),
+        });
+    }
+});

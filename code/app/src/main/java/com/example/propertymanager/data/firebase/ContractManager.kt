@@ -28,6 +28,15 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun markClientAccepted(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .collection("contracts").document(contractId)
+            .update("hasClientAccepted", true)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
 
     fun deleteContract(propertyId: String, contractId: String) {
         db.collection("properties").document(propertyId)

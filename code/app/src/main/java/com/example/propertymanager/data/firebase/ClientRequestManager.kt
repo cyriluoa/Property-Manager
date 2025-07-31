@@ -41,6 +41,14 @@ class ClientRequestManager  @Inject constructor(): FirestoreManager() {
             }
     }
 
+    fun updateRequestStatus(requestId: String, newStatus: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("client_requests").document(requestId)
+            .update("status", newStatus)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
     fun removeListener() {
         listenerRegistration?.remove()
     }

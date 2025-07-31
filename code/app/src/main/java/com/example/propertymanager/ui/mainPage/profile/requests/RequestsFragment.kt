@@ -23,6 +23,8 @@ class RequestsFragment : Fragment() {
     private val viewModel: RequestsViewModel by viewModels()
     private lateinit var adapter: ClientRequestAdapter
 
+    private var username: String = "You"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,10 +37,15 @@ class RequestsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = ClientRequestAdapter { request ->
+            viewModel.fetchClientUsername(request.clientId)
+            viewModel.clientUsername.observe(viewLifecycleOwner){
+                username = it.toString()
+            }
             viewModel.fetchPropertyAndContract(
                 request,
                 onSuccess = { property, contract ->
-                    val nextFragment = ViewContractFragment.newInstance(property,contract,"You",request.ownerName)
+
+                    val nextFragment = ViewContractFragment.newInstance(property,contract,username,request.ownerName,request)
                     parentFragmentManager.beginTransaction()
                         .setCustomAnimations(
                             R.anim.slide_in_right, R.anim.slide_out_left,
