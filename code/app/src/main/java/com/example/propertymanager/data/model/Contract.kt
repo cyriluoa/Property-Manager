@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class Contract(
     val id: String = "",
     val clientId: String = "",
-    val startDate: Timestamp? = null,
+    val startDate:  String = "",
     val contractLengthMonths: Int = 0,
     val monthlyRentBreakdown: List<RentBreakdown> = emptyList(),
     val preContractOverdueAmounts: List<OverdueItem> = emptyList(),

@@ -18,7 +18,8 @@ import java.util.Date
 import java.util.Locale
 
 class RentBreakdownAdapter(
-    private val context: Context
+    private val context: Context,
+    private val readOnly: Boolean = false
 ) : ListAdapter<RentBreakdown, RentBreakdownAdapter.RentViewHolder>(DiffCallback()) {
 
     inner class RentViewHolder(val binding: ItemMonthlyRentBreakdownBinding) :
@@ -44,28 +45,38 @@ class RentBreakdownAdapter(
 
         holder.binding.tvMonthYear.text = monthYearText
         holder.binding.etRentDate.setText(item.dueDate)
-
-        holder.binding.etRentDate.setOnClickListener {
-            val picker = DatePickerDialog(context, { _, y, m, d ->
-                if (y == year && m == month) {
-                    val newDate = Calendar.getInstance().apply { set(y, m, d) }.time
-                    item.dueDate = dateFormat.format(newDate)
-                    holder.binding.etRentDate.setText(item.dueDate)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Pick a date within $monthYearText",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }, year, month, calendar.get(Calendar.DAY_OF_MONTH))
-            picker.show()
-        }
-
         holder.binding.etRentAmount.setText(item.amount.toString())
-        holder.binding.etRentAmount.doOnTextChanged { text, _, _, _ ->
-            item.amount = text.toString().toDoubleOrNull() ?: 0.0
+
+        if(readOnly){
+            holder.binding.etRentDate.isFocusable = false
+            holder.binding.etRentDate.isClickable = false
+            holder.binding.etRentAmount.isEnabled = false
         }
+        else{
+            holder.binding.etRentDate.setOnClickListener {
+                val picker = DatePickerDialog(context, { _, y, m, d ->
+                    if (y == year && m == month) {
+                        val newDate = Calendar.getInstance().apply { set(y, m, d) }.time
+                        item.dueDate = dateFormat.format(newDate)
+                        holder.binding.etRentDate.setText(item.dueDate)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Pick a date within $monthYearText",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }, year, month, calendar.get(Calendar.DAY_OF_MONTH))
+                picker.show()
+            }
+
+
+            holder.binding.etRentAmount.doOnTextChanged { text, _, _, _ ->
+                item.amount = text.toString().toDoubleOrNull() ?: 0.0
+            }
+        }
+
+
     }
 
     fun getUpdatedList(): List<RentBreakdown> = currentList.toList()

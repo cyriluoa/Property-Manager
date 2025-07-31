@@ -20,8 +20,8 @@
                 android:orientation="vertical"
                 android:background="@drawable/header_gradient_bg"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="40dp"
-                android:paddingBottom="32dp">
+                android:paddingTop="48dp"
+                android:paddingBottom="40dp">
 
                 <!-- Header with Back Button -->
                 <LinearLayout
@@ -77,7 +77,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="30dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
                     app:strokeColor="@color/accent_light_blue"
@@ -161,7 +161,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="20dp"
+                    android:layout_marginBottom="30dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="6dp"
                     app:strokeColor="@color/accent_light_blue"
@@ -260,7 +260,10 @@
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rv_rent_breakdown"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            android:clipToPadding="false"
+                            android:paddingBottom="16dp"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
                     </LinearLayout>
 

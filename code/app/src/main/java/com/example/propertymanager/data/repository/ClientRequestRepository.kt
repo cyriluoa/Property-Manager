@@ -3,13 +3,19 @@ package com.example.propertymanager.data.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.propertymanager.data.firebase.ClientRequestManager
+import com.example.propertymanager.data.firebase.ContractManager
+import com.example.propertymanager.data.firebase.PropertyManager
 import com.example.propertymanager.data.model.ClientRequest
+import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.Property
 import jakarta.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ClientRequestRepository @Inject constructor(
-    private val manager: ClientRequestManager
+    private val manager: ClientRequestManager,
+    private val propertyManager: PropertyManager,
+    private val contractManager: ContractManager
 ) {
 
     private val _requests = MutableLiveData<List<ClientRequest>>()
@@ -49,5 +55,18 @@ class ClientRequestRepository @Inject constructor(
         _pendingCount.postValue(pending)
         _acceptedCount.postValue(accepted)
         _deniedCount.postValue(denied)
+    }
+
+    fun getPropertyAndContractForRequest(
+        propertyId: String,
+        contractId: String,
+        onSuccess: (Property, Contract) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        propertyManager.getPropertyById(propertyId, onSuccess = { property ->
+            contractManager.getContractById(propertyId, contractId, onSuccess = { contract ->
+                onSuccess(property, contract)
+            }, onFailure = onFailure)
+        }, onFailure = onFailure)
     }
 }

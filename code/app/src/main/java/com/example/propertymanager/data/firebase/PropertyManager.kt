@@ -26,6 +26,16 @@ class PropertyManager  @Inject constructor(): FirestoreManager(){
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun getPropertyById(propertyId: String, onSuccess: (Property) -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId).get()
+            .addOnSuccessListener { doc ->
+                doc.toObject(Property::class.java)?.let { onSuccess(it) }
+                    ?: onFailure(Exception("Property not found"))
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
     fun deleteProperty(propertyId: String) {
         db.collection("properties").document(propertyId).delete()
     }

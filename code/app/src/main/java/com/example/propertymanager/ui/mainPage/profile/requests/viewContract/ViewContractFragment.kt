@@ -1,11 +1,13 @@
-package com.example.propertymanager.ui.mainPage.properties.yourProperties.add.breakdown
+package com.example.propertymanager.ui.mainPage.profile.requests.viewContract
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,31 +17,35 @@ import com.example.propertymanager.data.model.ClientRequest
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.Property
 import com.example.propertymanager.databinding.FragmentAddPropertyDraftBinding
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.breakdown.AddPropertyDraftViewModel
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.breakdown.OverdueBreakdownAdapter
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.breakdown.RentBreakdownAdapter
 import com.google.firebase.Timestamp
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
 @AndroidEntryPoint
-class AddPropertyDraftFragment : Fragment() {
+class ViewContractFragment : Fragment() {
     private var _binding: FragmentAddPropertyDraftBinding? = null
     private val binding get() = _binding!!
     private lateinit var property: Property
     private lateinit var contract: Contract
     private lateinit var clientName: String
+
+    private lateinit var ownerName: String
     private lateinit var rentBreakdownAdapter: RentBreakdownAdapter
     private lateinit var overdueAdapter: OverdueBreakdownAdapter
-
-    private val viewModel: AddPropertyDraftViewModel by viewModels()
 
 
 
     companion object {
-        fun newInstance(property: Property, contract: Contract, clientName: String) =
-            AddPropertyDraftFragment().apply {
+        fun newInstance(property: Property, contract: Contract, clientName: String, ownerName: String) =
+            ViewContractFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable("property", property)
                     putParcelable("contract", contract)
                     putString("clientName", clientName)
+                    putString("ownerName",ownerName)
                 }
             }
     }
@@ -51,6 +57,8 @@ class AddPropertyDraftFragment : Fragment() {
             property = bundle.getParcelable("property") ?: error("Missing property data")
             contract = bundle.getParcelable("contract") ?: error("Missing contract data")
             clientName = bundle.getString("clientName") ?: "Unknown"
+            ownerName = bundle.getString("ownerName") ?: "Unknown"
+
         }
     }
 
@@ -65,91 +73,27 @@ class AddPropertyDraftFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        setUpViewContractViewChanges()
         setupPropertyCard()
         setupNoteListeners()
         setupAdapters()
 
-        // 👇 Fetch and observe owner's username
-        viewModel.ownerUsername.observe(viewLifecycleOwner) { username ->
-            binding.tvPropertyOwner.text = username
-        }
-        viewModel.fetchOwnerUsername(property.ownerId)
-
-        // 🔁 Observers for UI feedback
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-            binding.btnConfirm.isEnabled = !isLoading
-        }
-
-        viewModel.successMessage.observe(viewLifecycleOwner) { msg ->
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-            parentFragmentManager.popBackStack()
-            parentFragmentManager.popBackStack()
-        }
-
-        viewModel.errorMessage.observe(viewLifecycleOwner) { errMsg ->
-            Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
-        }
+    }
 
 
-        binding.btnCancel.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
+    private fun setUpViewContractViewChanges(){
+        binding.layoutConfirmCancel.visibility = View.GONE
+        binding.layoutAcceptDeny.visibility = View.VISIBLE
+        binding.btnBack.visibility = View.VISIBLE
 
-        binding.btnConfirm.setOnClickListener {
-            val notes = binding.etNotes.text?.toString()?.trim() ?: ""
-            val updatedRentBreakdown = rentBreakdownAdapter.getUpdatedList()
-
-            // Generate IDs
-            val propertyId = UUID.randomUUID().toString()
-            val contractId = UUID.randomUUID().toString()
-            val clientRequestId = UUID.randomUUID().toString()
-
-            // Add timestamp + id to contract
-            val finalContract = contract.copy(
-                id = contractId,
-                notes = notes,
-                createdAt = Timestamp.now(),
-                monthlyRentBreakdown = updatedRentBreakdown
-            )
-
-            // Add contract id to property
-            val finalProperty = property.copy(
-                id = propertyId,
-                currentContractId = contractId,
-                createdAt = Timestamp.now(),
-                updatedAt = Timestamp.now()
-            )
-
-            // Set up client request (ownerName can be observed from ViewModel)
-            val ownerName = viewModel.ownerUsername.value ?: "Unknown"
-            val clientRequest = ClientRequest(
-                id = clientRequestId,
-                clientId = finalContract.clientId,
-                ownerId = finalProperty.ownerId,
-                propertyId = propertyId,
-                contractId = contractId,
-                ownerName = ownerName,
-                propertyName = finalProperty.name
-            )
-
-            // ✅ Now pass these 3 objects to your ViewModel
-            viewModel.submitPropertyWithContractAndRequest(
-                finalProperty,
-                finalContract,
-                clientRequest
-            )
-
-            Log.d("Submit", "Property: $finalProperty")
-            Log.d("Submit", "Contract: $finalContract")
-            Log.d("Submit", "ClientRequest: $clientRequest")
-        }
 
     }
 
 
     private fun setupPropertyCard() {
-        binding.tvPropertyName.text = "Owner: " + property.name
+        binding.tvPropertyName.text = property.name
+        binding.tvPropertyOwner.text = "Owner: " + ownerName
         binding.tvPropertyClient.text = "Client: " + clientName
 
         if (!property.imageUrl.isNullOrEmpty()) {
@@ -161,15 +105,24 @@ class AddPropertyDraftFragment : Fragment() {
     }
 
     private fun setupNoteListeners() {
-        binding.etNotes.doOnTextChanged { text, _, _, _ ->
-            val count = text?.length ?: 0
-            binding.tvCharacterCount.text = "$count/500"
-        }
+        // Set the notes
+        binding.etNotes.setText(contract.notes)
+
+        // Disable editing
+        binding.etNotes.isFocusable = false
+        binding.etNotes.isClickable = false
+        binding.etNotes.isCursorVisible = false
+        binding.etNotes.isLongClickable = false
+
+        // Update character count
+        val count = contract.notes.length
+        binding.tvCharacterCount.text = "$count/500"
     }
+
 
     private fun setupAdapters() {
         // Rent Breakdown Adapter
-        rentBreakdownAdapter = RentBreakdownAdapter(requireContext())
+        rentBreakdownAdapter = RentBreakdownAdapter(requireContext(), readOnly = true)
         binding.rvRentBreakdown.adapter = rentBreakdownAdapter
         binding.rvRentBreakdown.layoutManager = LinearLayoutManager(requireContext())
         rentBreakdownAdapter.submitList(contract.monthlyRentBreakdown)
@@ -194,4 +147,3 @@ class AddPropertyDraftFragment : Fragment() {
         _binding = null
     }
 }
-

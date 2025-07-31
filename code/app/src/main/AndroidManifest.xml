@@ -50,6 +50,7 @@
             android:name=".ui.mainPage.properties.yourProperties.YourPropertiesActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true" />
+        <activity android:name=".ui.mainPage.profile.requests.RequestsActivity"/>
         <service
             android:name=".messaging.MyFirebaseMessagingService"
             android:exported="false">

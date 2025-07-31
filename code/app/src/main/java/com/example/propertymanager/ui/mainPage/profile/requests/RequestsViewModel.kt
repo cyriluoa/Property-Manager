@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 
 import com.example.propertymanager.data.model.ClientRequest
+import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.Property
 import com.example.propertymanager.data.repository.ClientRequestRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -27,4 +29,18 @@ class RequestsViewModel @Inject constructor(
     fun stopListening() {
         repository.removeListener()
     }
+
+    fun fetchPropertyAndContract(
+        request: ClientRequest,
+        onSuccess: (Property, Contract) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        repository.getPropertyAndContractForRequest(
+            request.propertyId,
+            request.contractId,
+            onSuccess,
+            onFailure
+        )
+    }
+
 }

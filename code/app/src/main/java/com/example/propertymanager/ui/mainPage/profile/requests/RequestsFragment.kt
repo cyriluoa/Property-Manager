@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentRequestsBinding
+import com.example.propertymanager.ui.mainPage.profile.requests.viewContract.ViewContractFragment
 import com.example.propertymanager.ui.mainPage.requests.ClientRequestAdapter
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,8 +35,26 @@ class RequestsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = ClientRequestAdapter { request ->
-            Toast.makeText(requireContext(), "Clicked: ${request.propertyName}", Toast.LENGTH_SHORT).show()
+            viewModel.fetchPropertyAndContract(
+                request,
+                onSuccess = { property, contract ->
+                    val nextFragment = ViewContractFragment.newInstance(property,contract,"You",request.ownerName)
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_right, R.anim.slide_out_left,
+                            R.anim.slide_in_left, R.anim.slide_out_right
+                        )
+                        .replace(R.id.fragment_container, nextFragment)
+                        .addToBackStack(null)
+                        .commit()
+                    // TODO: navigate to contract details screen
+                },
+                onFailure = {
+                    Toast.makeText(requireContext(), "Failed: ${it.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            )
         }
+
 
         binding.rvRequests.adapter = adapter
 

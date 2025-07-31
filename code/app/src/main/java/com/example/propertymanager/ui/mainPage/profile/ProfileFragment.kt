@@ -17,6 +17,7 @@ import com.example.propertymanager.main.MainActivity
 import com.example.propertymanager.sharedPrefs.Prefs
 import com.example.propertymanager.ui.createAccount.CreateAccountFragment
 import com.example.propertymanager.ui.mainPage.main.MainPageActivity
+import com.example.propertymanager.ui.mainPage.profile.requests.RequestsActivity
 import com.example.propertymanager.ui.mainPage.profile.requests.RequestsFragment
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -89,15 +90,10 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnRequests.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_right, R.anim.slide_out_left,
-                    R.anim.slide_in_left, R.anim.slide_out_right
-                )
-                .replace(R.id.main_fragment_container, RequestsFragment())
-                .addToBackStack(null)
-                .commit()
+            val intent = Intent(requireContext(), RequestsActivity::class.java)
+            startActivity(intent)
         }
+
 
 
     }

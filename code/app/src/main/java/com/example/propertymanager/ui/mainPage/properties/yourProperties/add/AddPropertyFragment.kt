@@ -132,6 +132,17 @@ class AddPropertyFragment : Fragment() {
                 rentBreakdown.add(RentBreakdown(targetDate.format(formatter), rentAmount))
             }
 
+            val formattedStartDate = selectedStartDate!!.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+
+            val contract = Contract(
+                clientId = clientId,
+                startDate = formattedStartDate,
+                contractLengthMonths = contractLength,
+                monthlyRentBreakdown = rentBreakdown,
+                preContractOverdueAmounts = overdueItems
+            )
+
+
             val property = Property(
 
                 name = propertyName,
@@ -139,12 +150,6 @@ class AddPropertyFragment : Fragment() {
                 imageUrl = imageUrl
             )
 
-            val contract = Contract(
-                clientId = clientId,
-                contractLengthMonths = contractLength,
-                monthlyRentBreakdown = rentBreakdown,
-                preContractOverdueAmounts = overdueItems
-            )
 
             val nextFragment = AddPropertyDraftFragment.newInstance(property, contract, clientName)
 

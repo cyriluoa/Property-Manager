@@ -18,6 +18,17 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun getContractById(propertyId: String, contractId: String, onSuccess: (Contract) -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .collection("contracts").document(contractId).get()
+            .addOnSuccessListener { doc ->
+                doc.toObject(Contract::class.java)?.let { onSuccess(it) }
+                    ?: onFailure(Exception("Contract not found"))
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
     fun deleteContract(propertyId: String, contractId: String) {
         db.collection("properties").document(propertyId)
             .collection("contracts").document(contractId)
