@@ -1,5 +1,6 @@
 package com.example.propertymanager.data.firebase
 
+import android.util.Log
 import com.example.propertymanager.data.model.Property
 import com.google.firebase.Timestamp
 import jakarta.inject.Inject
@@ -38,5 +39,28 @@ class PropertyManager  @Inject constructor(): FirestoreManager(){
 
     fun deleteProperty(propertyId: String) {
         db.collection("properties").document(propertyId).delete()
+    }
+
+    fun listenToOwnerProperties(
+        ownerId: String,
+        onSnapshot: (List<Property>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        db.collection("properties")
+            .whereEqualTo("ownerId", ownerId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot == null || snapshot.isEmpty) {
+                    onSnapshot(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val properties = snapshot.toObjects(Property::class.java)
+                onSnapshot(properties)
+            }
     }
 }

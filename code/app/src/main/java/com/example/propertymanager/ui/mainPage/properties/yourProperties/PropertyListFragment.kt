@@ -7,12 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
-import com.example.propertymanager.data.model.DisplayProperty
 import com.example.propertymanager.databinding.FragmentPropertyListBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.AddPropertyFragment
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,6 +23,8 @@ class PropertyListFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
+
+    private val viewModel: PropertyListViewModel by viewModels()
 
     private lateinit var adapter: PropertyListAdapter
 
@@ -55,32 +58,21 @@ class PropertyListFragment : Fragment() {
                 .commit()
         }
 
-        // 🔧 For now, show dummy data
-        val testList = listOf(
-            DisplayProperty(
-                propertyId = "1",
-                propertyName = "Sunset Villa Apartment",
-                imageUrl = null,
-                status = "PENDING",
-                currentTenantName = "John Smith",
-                dueThisMonth = 1200.0,
-                totalDue = 3600.0
-            ),
+        // 🔄 Start listening to live Firestore data
+        val ownerId = FirebaseAuth.getInstance().currentUser?.uid
+        if (ownerId != null) {
+            viewModel.startListening(ownerId)
+        }
 
-            DisplayProperty(
-                propertyId = "2",
-                propertyName = "Sunset Villa Apartment",
-                imageUrl = null,
-                status = "PENDING",
-                currentTenantName = "John Smitho",
-                dueThisMonth = 1200.0,
-                totalDue = 2400.0
-            )
+        viewModel.displayProperties.observe(viewLifecycleOwner) { propertyList ->
+            adapter.submitList(propertyList)
+        }
 
-
-        )
-
-        adapter.submitList(testList)
+        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+            errorMessage?.let {
+                Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -88,4 +80,5 @@ class PropertyListFragment : Fragment() {
         _binding = null
     }
 }
+
 
