@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
+import com.example.propertymanager.data.model.DisplayProperty
 import com.example.propertymanager.databinding.FragmentPropertyListBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.AddPropertyFragment
@@ -20,8 +23,7 @@ class PropertyListFragment : Fragment() {
 
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
 
-
-
+    private lateinit var adapter: PropertyListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,8 +36,14 @@ class PropertyListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.fabAddProperty.setOnClickListener {
+        adapter = PropertyListAdapter { clickedItem ->
+            Toast.makeText(requireContext(), "Clicked: ${clickedItem.propertyName}", Toast.LENGTH_SHORT).show()
+        }
 
+        binding.rvProperties.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvProperties.adapter = adapter
+
+        binding.fabAddProperty.setOnClickListener {
             imageSharedViewModel.clear()
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
@@ -47,8 +55,32 @@ class PropertyListFragment : Fragment() {
                 .commit()
         }
 
+        // 🔧 For now, show dummy data
+        val testList = listOf(
+            DisplayProperty(
+                propertyId = "1",
+                propertyName = "Sunset Villa Apartment",
+                imageUrl = null,
+                status = "PENDING",
+                currentTenantName = "John Smith",
+                dueThisMonth = 1200.0,
+                totalDue = 3600.0
+            ),
 
-        // TODO: Setup RecyclerView for property list
+            DisplayProperty(
+                propertyId = "2",
+                propertyName = "Sunset Villa Apartment",
+                imageUrl = null,
+                status = "PENDING",
+                currentTenantName = "John Smitho",
+                dueThisMonth = 1200.0,
+                totalDue = 2400.0
+            )
+
+
+        )
+
+        adapter.submitList(testList)
     }
 
     override fun onDestroyView() {
@@ -56,3 +88,4 @@ class PropertyListFragment : Fragment() {
         _binding = null
     }
 }
+

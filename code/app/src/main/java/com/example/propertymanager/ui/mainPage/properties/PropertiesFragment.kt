@@ -27,7 +27,7 @@ class PropertiesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.cardYourProperties.setOnClickListener {
+        binding.btnManage.setOnClickListener {
             startActivity(Intent(requireContext(), YourPropertiesActivity::class.java))
         }
 
