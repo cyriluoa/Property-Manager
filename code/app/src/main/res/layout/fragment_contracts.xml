@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -40,12 +41,20 @@
                     android:textColor="@color/primary_blue"
                     android:layout_marginBottom="12dp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvActiveContracts"
+                <include
+                    layout="@layout/item_contract"
+                    android:id="@+id/layoutActiveContract"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvNoActiveContract"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    android:nestedScrollingEnabled="false" />
+                    android:text="No current active contract"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    android:paddingBottom="24dp" />
 
                 <!-- Inactive Contracts Section -->
                 <TextView
@@ -57,16 +66,21 @@
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="12dp" />
 
+                <TextView
+                    android:id="@+id/tvNoInactiveContracts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No previous contracts yet"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvInactiveContracts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false" />
-
             </LinearLayout>
-
         </ScrollView>
-
     </LinearLayout>
-
 </layout>

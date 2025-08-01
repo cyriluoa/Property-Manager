@@ -76,7 +76,9 @@ class ClientRequestRepository @Inject constructor(
         onFailure: (Exception) -> Unit
     ) {
         manager.updateRequestStatus(request.id, "accepted", onSuccess = {
-            contractManager.markContractAccepted(request.propertyId, request.contractId, onSuccess, onFailure)
+            contractManager.markContractAccepted(request.propertyId, request.contractId, onSuccess = {
+                propertyManager.setPropertyStateOccupied(request.propertyId, request.contractId, onSuccess, onFailure)
+            }, onFailure = onFailure)
         }, onFailure = onFailure)
     }
 
@@ -86,7 +88,9 @@ class ClientRequestRepository @Inject constructor(
         onFailure: (Exception) -> Unit
     ) {
         manager.updateRequestStatus(request.id, "denied", onSuccess = {
-            contractManager.markContractDenied(request.propertyId, request.contractId, onSuccess, onFailure)
+            contractManager.markContractDenied(request.propertyId, request.contractId, onSuccess = {
+                propertyManager.removeCurrentContract(request.propertyId, onSuccess, onFailure)
+            }, onFailure = onFailure)
         }, onFailure = onFailure)
     }
 

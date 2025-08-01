@@ -1,7 +1,8 @@
 package com.example.propertymanager.data.firebase
 
-import android.util.Log
+
 import com.example.propertymanager.data.model.Property
+import com.example.propertymanager.data.model.PropertyState
 import com.google.firebase.Timestamp
 import jakarta.inject.Inject
 import javax.inject.Singleton
@@ -63,4 +64,31 @@ class PropertyManager  @Inject constructor(): FirestoreManager(){
                 onSnapshot(properties)
             }
     }
+
+    fun removeCurrentContract(propertyId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .update(
+                mapOf(
+                    "currentContractId" to null,
+                    "status" to PropertyState.VACANT.name,
+                    "updatedAt" to Timestamp.now()
+                )
+            )
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    fun setPropertyStateOccupied(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .update(
+                mapOf(
+                    "currentContractId" to contractId,
+                    "status" to PropertyState.OCCUPIED.name,
+                    "updatedAt" to Timestamp.now()
+                )
+            )
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 }
