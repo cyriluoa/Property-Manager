@@ -36,7 +36,7 @@ class ViewContractViewModel @Inject constructor(
 
     fun denyRequest(request: ClientRequest) {
         _loading.value = true
-        repository.denyRequest(
+        repository.denyRequestAndMarkContractDenied(
             request,
             onSuccess = {
                 _loading.postValue(false)

@@ -70,14 +70,25 @@ class ClientRequestRepository @Inject constructor(
         }, onFailure = onFailure)
     }
 
-    fun acceptRequestAndMarkContractAccepted(request: ClientRequest, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun acceptRequestAndMarkContractAccepted(
+        request: ClientRequest,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         manager.updateRequestStatus(request.id, "accepted", onSuccess = {
-            contractManager.markClientAccepted(request.propertyId, request.contractId, onSuccess, onFailure)
+            contractManager.markContractAccepted(request.propertyId, request.contractId, onSuccess, onFailure)
         }, onFailure = onFailure)
     }
 
-    fun denyRequest(request: ClientRequest, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        manager.updateRequestStatus(request.id, "denied", onSuccess, onFailure)
+    fun denyRequestAndMarkContractDenied(
+        request: ClientRequest,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        manager.updateRequestStatus(request.id, "denied", onSuccess = {
+            contractManager.markContractDenied(request.propertyId, request.contractId, onSuccess, onFailure)
+        }, onFailure = onFailure)
     }
+
 
 }

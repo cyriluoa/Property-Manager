@@ -133,10 +133,14 @@ class AddPropertyFragment : Fragment() {
             }
 
             val formattedStartDate = selectedStartDate!!.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+            val formattedEndDate = selectedStartDate!!.plusMonths(contractLength.toLong())
+                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+
 
             val contract = Contract(
                 clientId = clientId,
                 startDate = formattedStartDate,
+                endDate = formattedEndDate,
                 contractLengthMonths = contractLength,
                 monthlyRentBreakdown = rentBreakdown,
                 preContractOverdueAmounts = overdueItems

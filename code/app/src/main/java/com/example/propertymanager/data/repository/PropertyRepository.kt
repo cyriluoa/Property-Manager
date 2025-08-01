@@ -81,7 +81,7 @@ class PropertyRepository @Inject constructor(
                         contractId = currentContractId,
                         onSuccess = { contract ->
                             val clientId = contract.clientId
-                            val status = if (contract.hasClientAccepted) "OCCUPIED" else "PENDING"
+                            val status = property.status.toString()
 
                             userManager.getUsernameByUid(clientId, { clientName ->
                                 displayList.add(

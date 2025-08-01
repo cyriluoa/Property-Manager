@@ -14,4 +14,5 @@ data class Property(
     val currentContractId: String? = null,
     val createdAt: Timestamp? = null,
     val updatedAt: Timestamp? = null,
+    val status: PropertyState = PropertyState.VACANT
 ) : Parcelable

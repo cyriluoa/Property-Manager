@@ -68,11 +68,7 @@ class PropertyListFragment : Fragment() {
             adapter.submitList(propertyList)
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
-            errorMessage?.let {
-                Toast.makeText(requireContext(), "Error: $it", Toast.LENGTH_SHORT).show()
-            }
-        }
+
     }
 
     override fun onDestroyView() {

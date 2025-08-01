@@ -1,6 +1,7 @@
 package com.example.propertymanager.data.firebase
 
 import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.ContractState
 import com.google.firebase.Timestamp
 import jakarta.inject.Inject
 import javax.inject.Singleton
@@ -28,13 +29,22 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
             .addOnFailureListener { onFailure(it) }
     }
 
-    fun markClientAccepted(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    fun markContractAccepted(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
         db.collection("properties").document(propertyId)
             .collection("contracts").document(contractId)
-            .update("hasClientAccepted", true)
+            .update("contractState", ContractState.ACCEPTED.name)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun markContractDenied(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .collection("contracts").document(contractId)
+            .update("contractState", ContractState.DENIED.name)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 
 
 
