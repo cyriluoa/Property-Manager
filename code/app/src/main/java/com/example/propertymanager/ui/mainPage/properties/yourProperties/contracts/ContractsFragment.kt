@@ -5,16 +5,39 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.data.model.Contract
-import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.databinding.FragmentContractsBinding
 import com.example.propertymanager.databinding.ItemContractBinding
+import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.*
 
+
+@AndroidEntryPoint
 class ContractsFragment : Fragment() {
 
     private var _binding: FragmentContractsBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: ContractsViewModel by viewModels()
+
+    private val propertyId: String by lazy {
+        requireArguments().getString(ARG_PROPERTY_ID) ?: error("Property ID not passed")
+    }
+
+    companion object {
+        private const val ARG_PROPERTY_ID = "property_id"
+
+        fun newInstance(propertyId: String): ContractsFragment {
+            val fragment = ContractsFragment()
+            fragment.arguments = Bundle().apply {
+                putString(ARG_PROPERTY_ID, propertyId)
+            }
+            return fragment
+        }
+    }
 
     private lateinit var inactiveAdapter: ContractAdapter
 
@@ -29,7 +52,8 @@ class ContractsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupInactiveRecycler()
-        loadMockContracts()
+        viewModel.loadContracts(propertyId)
+        observeViewModel()
     }
 
     private fun setupInactiveRecycler() {
@@ -40,68 +64,37 @@ class ContractsFragment : Fragment() {
         }
     }
 
-    private fun loadMockContracts() {
-        val mockInactiveContracts = listOf(
-            Contract(
-                id = "c1",
-                clientId = "client1",
-                startDate = "01-01-2023",
-                endDate = "01-01-2024",
-                contractLengthMonths = 12,
-                createdAt = null,
-                contractState = ContractState.OVER,
-                preContractOverdueAmounts = listOf(),
-                notes = ""
-            ),
-            Contract(
-                id = "c2",
-                clientId = "client2",
-                startDate = "01-02-2023",
-                endDate = "01-02-2024",
-                contractLengthMonths = 12,
-                createdAt = null,
-                contractState = ContractState.OVER,
-                preContractOverdueAmounts = listOf(),
-                notes = ""
-            )
-        )
-
-        val activeContract = Contract(
-            id = "c3",
-            clientId = "client3",
-            startDate = "01-03-2024",
-            endDate = "01-12-2025",
-            contractLengthMonths = 12,
-            createdAt = null,
-            contractState = ContractState.ACTIVE,
-            preContractOverdueAmounts = listOf(),
-            notes = ""
-        )
-
-        // Bind Active Contract
-        if (activeContract.contractState == ContractState.ACTIVE) {
-            val activeBinding = ItemContractBinding.bind(binding.layoutActiveContract.rootView)
-            bindContractToCard(activeBinding, activeContract)
-            binding.layoutActiveContract.visibility = View.VISIBLE
-            binding.tvNoActiveContract.visibility = View.GONE
-        } else {
-            binding.layoutActiveContract.visibility = View.GONE
-            binding.tvNoActiveContract.visibility = View.VISIBLE
+    private fun observeViewModel() {
+        viewModel.activeContract.observe(viewLifecycleOwner) { activeContract ->
+            if (activeContract != null) {
+                bindContractToCard(binding.layoutActiveContract, activeContract)
+                binding.layoutActiveContract.root.visibility = View.VISIBLE
+                binding.tvNoActiveContract.visibility = View.GONE
+            } else {
+                binding.layoutActiveContract.root.visibility = View.GONE
+                binding.tvNoActiveContract.visibility = View.VISIBLE
+            }
         }
 
-        // Bind Inactive Contracts
-        if (mockInactiveContracts.isNotEmpty()) {
-            inactiveAdapter.submitList(mockInactiveContracts)
-            binding.tvNoInactiveContracts.visibility = View.GONE
-        } else {
-            binding.tvNoInactiveContracts.visibility = View.VISIBLE
+        viewModel.inactiveContracts.observe(viewLifecycleOwner) { contracts ->
+            if (contracts.isNotEmpty()) {
+                inactiveAdapter.submitList(contracts)
+                binding.tvNoInactiveContracts.visibility = View.GONE
+            } else {
+                binding.tvNoInactiveContracts.visibility = View.VISIBLE
+            }
         }
     }
 
     private fun bindContractToCard(cardBinding: ItemContractBinding, contract: Contract) {
         cardBinding.tvContractDuration.text = "${contract.startDate} - ${contract.endDate}"
         cardBinding.tvContractLength.text = "${contract.contractLengthMonths} months"
-        cardBinding.tvCreatedAt.text = "N/A"
+
+        val createdAtText = contract.createdAt?.let {
+            SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(it.toDate())
+        } ?: "N/A"
+        cardBinding.tvCreatedAt.text = createdAtText
+
         cardBinding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
         cardBinding.tvContractStatus.text = contract.contractState.name
     }
@@ -111,3 +104,4 @@ class ContractsFragment : Fragment() {
         _binding = null
     }
 }
+

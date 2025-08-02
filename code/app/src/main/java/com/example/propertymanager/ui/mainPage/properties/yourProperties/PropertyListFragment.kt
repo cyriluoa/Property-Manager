@@ -13,6 +13,7 @@ import com.example.propertymanager.R
 import com.example.propertymanager.databinding.FragmentPropertyListBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.add.AddPropertyFragment
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.ContractsFragment
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -40,8 +41,18 @@ class PropertyListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = PropertyListAdapter { clickedItem ->
-            Toast.makeText(requireContext(), "Clicked: ${clickedItem.propertyName}", Toast.LENGTH_SHORT).show()
+            val fragment = ContractsFragment.newInstance(clickedItem.propertyId)
+
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
         }
+
 
         binding.rvProperties.layoutManager = LinearLayoutManager(requireContext())
         binding.rvProperties.adapter = adapter

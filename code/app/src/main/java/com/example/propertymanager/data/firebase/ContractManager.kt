@@ -53,4 +53,25 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
             .collection("contracts").document(contractId)
             .delete()
     }
+
+    fun listenToContracts(
+        propertyId: String,
+        onSuccess: (List<Contract>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        db.collection("properties").document(propertyId)
+            .collection("contracts")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onFailure(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val contracts = snapshot.documents.mapNotNull { it.toObject(Contract::class.java) }
+                    onSuccess(contracts)
+                }
+            }
+    }
+
 }
