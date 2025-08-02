@@ -135,6 +135,19 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <!-- View Payments Button -->
+            <Button
+                android:id="@+id/btnViewPayments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="View Payments"
+                android:textStyle="bold"
+                android:layout_gravity="end"
+                android:backgroundTint="@color/primary_blue"
+                android:textColor="@color/white"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="4dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

@@ -206,3 +206,180 @@ async function sendContractNotification(clientId, ownerId, status, propertyName)
     }
   }
 }
+
+
+
+
+exports.markPayablesDue = onSchedule(
+  {
+    schedule: "0 10 * * *", // 10:00 AM IST
+    timeZone: "Asia/Kolkata",
+  },
+  async () => {
+    logger.log("🔔 Triggered: markPayablesDue");
+
+    const properties = await admin.firestore().collection("properties").get();
+    logger.log(`📦 Fetched ${properties.size} properties`);
+
+    for (const propertyDoc of properties.docs) {
+      const propertyId = propertyDoc.id;
+      const propertyData = propertyDoc.data();
+
+      if (!propertyData.currentContractId) continue;
+
+      const contractRef = admin
+        .firestore()
+        .collection("properties")
+        .doc(propertyId)
+        .collection("contracts")
+        .doc(propertyData.currentContractId);
+
+      const contractDoc = await contractRef.get();
+      if (!contractDoc.exists) continue;
+
+      const contract = contractDoc.data();
+      if (contract.contractState !== "ACTIVE") continue;
+
+      const payableSnapshot = await contractRef.collection("payableItems").get();
+      logger.log(`➡️ ${propertyId} → ${payableSnapshot.size} payable items found`);
+
+      for (const item of payableSnapshot.docs) {
+        const itemData = item.data();
+        if (itemData.status === "NOT_APPLIED_YET") {
+          if (shouldUpdateStatus(itemData.startDate)) {
+            logger.log(`✅ Updating item ${item.id} to DUE`);
+            await item.ref.update({ status: "DUE" });
+            await sendPayableStatusNotification(itemData, "DUE");
+          }
+        }
+      }
+    }
+
+    logger.log("✅ Completed: markPayablesDue");
+    return null;
+  }
+);
+
+
+
+exports.markPayablesOverdue = onSchedule(
+  {
+    schedule: "05 10 * * *", // 10:05 AM IST
+    timeZone: "Asia/Kolkata",
+  },
+  async () => {
+    logger.log("🔔 Triggered: markPayablesOverdue");
+
+    const properties = await admin.firestore().collection("properties").get();
+    logger.log(`📦 Fetched ${properties.size} properties`);
+
+    for (const propertyDoc of properties.docs) {
+      const propertyId = propertyDoc.id;
+      const propertyData = propertyDoc.data();
+
+      if (!propertyData.currentContractId) continue;
+
+      const contractRef = admin
+        .firestore()
+        .collection("properties")
+        .doc(propertyId)
+        .collection("contracts")
+        .doc(propertyData.currentContractId);
+
+      const contractDoc = await contractRef.get();
+      if (!contractDoc.exists) continue;
+
+      const contract = contractDoc.data();
+      if (contract.contractState !== "ACTIVE") continue;
+
+      const payableSnapshot = await contractRef.collection("payableItems").get();
+      logger.log(`➡️ ${propertyId} → ${payableSnapshot.size} payable items found`);
+
+      for (const item of payableSnapshot.docs) {
+        const itemData = item.data();
+        if (itemData.status === "DUE") {
+          if (shouldUpdateStatus(itemData.dueDate)) {
+            logger.log(`⚠️ Marking item ${item.id} as OVERDUE`);
+            await item.ref.update({ status: "OVERDUE" });
+            await sendPayableStatusNotification(itemData, "OVERDUE");
+          }
+        }
+      }
+    }
+
+    logger.log("✅ Completed: markPayablesOverdue");
+    return null;
+  }
+);
+
+
+
+async function sendPayableStatusNotification(item, newStatus) {
+  const notificationText = `This month's rent is now ${newStatus}.`;
+
+  const users = [item.clientId, item.ownerId];
+  const messaging = admin.messaging();
+
+  for (const uid of users) {
+    try {
+      const userDoc = await admin.firestore().collection("users").doc(uid).get();
+      const tokens = userDoc.data()?.fcmTokens || [];
+
+      if (tokens.length === 0) continue;
+
+      const payload = {
+        notification: {
+          title: `Payable ${newStatus}`,
+          body: notificationText,
+        },
+        data: {
+          type: "payable_status",
+          status: newStatus,
+          payableId: item.id,
+        },
+      };
+
+      const invalidTokens = [];
+
+      for (const token of tokens) {
+        try {
+          await messaging.send({ token, ...payload });
+          logger.log(`📩 Notification sent to ${uid} (${newStatus})`);
+        } catch (err) {
+          logger.error(`❌ Failed to send to ${token}`, err);
+          invalidTokens.push(token);
+        }
+      }
+
+      if (invalidTokens.length > 0) {
+        await admin
+          .firestore()
+          .collection("users")
+          .doc(uid)
+          .update({
+            fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens),
+          });
+        logger.log(`🧹 Removed invalid tokens for user ${uid}`);
+      }
+    } catch (err) {
+      logger.error(`💥 Error notifying user ${uid}:`, err);
+    }
+  }
+}
+
+
+
+
+
+/**
+ * Checks if a PayableItem should update status based on today's date and item date.
+ * @param {string} itemDateStr - date in "DD-MM-YYYY" format
+ * @param {string} comparison - "onOrAfter" | "before"
+ * @returns {boolean}
+ */
+function shouldUpdateStatus(itemDateStr) {
+  const today = moment().tz("Asia/Kolkata").startOf("day");
+  const itemDate = moment.tz(itemDateStr, "DD-MM-YYYY", "Asia/Kolkata").startOf("day");
+
+  return today.isSameOrAfter(itemDate);
+}

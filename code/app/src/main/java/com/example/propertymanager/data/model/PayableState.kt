@@ -1,8 +1,9 @@
 package com.example.propertymanager.data.model
 
-enum class PayableStatus {
+enum class PayableState {
     NOT_APPLIED_YET,
     DUE,
+    PAID,
     OVERDUE,
-    PAID
+    PAID_LATE
 }
