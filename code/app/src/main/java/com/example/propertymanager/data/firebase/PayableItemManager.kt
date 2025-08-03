@@ -1,11 +1,13 @@
 package com.example.propertymanager.data.firebase
 
 
+import android.util.Log
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableItemType
 import com.example.propertymanager.data.model.PayableState
 import com.example.propertymanager.data.model.Property
+import com.google.firebase.firestore.ListenerRegistration
 import jakarta.inject.Inject
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -107,5 +109,51 @@ class PayableItemManager @Inject constructor() : FirestoreManager() {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun listenToPayableItems(
+        propertyId: String,
+        contractId: String,
+        onMonthlyItems: (List<PayableItem>) -> Unit,
+        onOverdueItems: (List<PayableItem>) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration {
+        val query = db.collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+
+        return query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                onError(error)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null) {
+                val allItems = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        doc.toObject(PayableItem::class.java)
+                    } catch (e: Exception) {
+                        Log.e("PayableItemParseError", "Error parsing item ${doc.id}: ${e.message}")
+                        null
+                    }
+                }
+
+
+                val monthlyItems = allItems
+                    .filter { it.type == PayableItemType.MONTHLY }
+                    .sortedBy { it.monthIndex ?: Int.MAX_VALUE }
+
+                Log.d("Listen to payable items", monthlyItems.size.toString())
+
+                val overdueItems = allItems.filter { it.type == PayableItemType.PRE_CONTRACT_OVERDUE }
+
+                onMonthlyItems(monthlyItems)
+                onOverdueItems(overdueItems)
+            }
+        }
+    }
+
+
 
 }

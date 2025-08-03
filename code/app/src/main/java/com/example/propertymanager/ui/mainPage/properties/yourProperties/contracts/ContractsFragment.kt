@@ -1,15 +1,18 @@
 package com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.propertymanager.R
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.databinding.FragmentContractsBinding
 import com.example.propertymanager.databinding.ItemContractBinding
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.payableItems.PayableItemsFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -27,6 +30,8 @@ class ContractsFragment : Fragment() {
         requireArguments().getString(ARG_PROPERTY_ID) ?: error("Property ID not passed")
     }
 
+
+
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
 
@@ -40,6 +45,23 @@ class ContractsFragment : Fragment() {
     }
 
     private lateinit var inactiveAdapter: ContractAdapter
+
+    private val onContractClick: (Contract) -> Unit = { selectedContract ->
+        Log.d("ContractsFragment", "View bills clicked for contract: ${selectedContract.id}")
+
+        val fragment = PayableItemsFragment.newInstance(propertyId, selectedContract.id)
+
+        parentFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right
+            )
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -57,7 +79,10 @@ class ContractsFragment : Fragment() {
     }
 
     private fun setupInactiveRecycler() {
-        inactiveAdapter = ContractAdapter()
+        inactiveAdapter = ContractAdapter{ selectedContract ->
+            onContractClick
+
+        }
         binding.rvInactiveContracts.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = inactiveAdapter
@@ -67,7 +92,7 @@ class ContractsFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.activeContract.observe(viewLifecycleOwner) { activeContract ->
             if (activeContract != null) {
-                bindContractToCard(binding.layoutActiveContract, activeContract)
+                bindContractToCard(binding.layoutActiveContract, activeContract,onContractClick)
                 binding.layoutActiveContract.root.visibility = View.VISIBLE
                 binding.tvNoActiveContract.visibility = View.GONE
             } else {
@@ -86,7 +111,11 @@ class ContractsFragment : Fragment() {
         }
     }
 
-    private fun bindContractToCard(cardBinding: ItemContractBinding, contract: Contract) {
+    private fun bindContractToCard(
+        cardBinding: ItemContractBinding,
+        contract: Contract,
+        onClick: (Contract) -> Unit
+    ) {
         cardBinding.tvContractDuration.text = "${contract.startDate} - ${contract.endDate}"
         cardBinding.tvContractLength.text = "${contract.contractLengthMonths} months"
 
@@ -97,7 +126,12 @@ class ContractsFragment : Fragment() {
 
         cardBinding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
         cardBinding.tvContractStatus.text = contract.contractState.name
+
+        cardBinding.btnViewBills.setOnClickListener {
+            onClick(contract)
+        }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

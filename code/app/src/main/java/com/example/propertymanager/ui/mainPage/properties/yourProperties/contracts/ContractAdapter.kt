@@ -11,7 +11,9 @@ import com.example.propertymanager.data.model.Contract
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ContractAdapter : ListAdapter<Contract, ContractAdapter.ContractViewHolder>(ContractDiffCallback()) {
+class ContractAdapter(
+    private val onViewPaymentsClick: (Contract) -> Unit
+) : ListAdapter<Contract, ContractAdapter.ContractViewHolder>(ContractDiffCallback()) {
 
     inner class ContractViewHolder(private val binding: ItemContractBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -38,6 +40,10 @@ class ContractAdapter : ListAdapter<Contract, ContractAdapter.ContractViewHolder
             }
 
             binding.tvContractStatus.setBackgroundResource(badgeRes)
+
+            binding.btnViewBills.setOnClickListener {
+                onViewPaymentsClick(contract)
+            }
         }
     }
 

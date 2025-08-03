@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/contractCard"
+        android:id="@+id/payableCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -29,20 +29,20 @@
                 android:gravity="center_vertical">
 
                 <TextView
-                    android:id="@+id/tvContractDuration"
+                    android:id="@+id/tvPayableTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="May 2025 - March 2026"
+                    android:text="September 2025 Rent"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvContractStatus"
+                    android:id="@+id/tvPayableStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ACTIVE"
+                    android:text="DUE"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:textColor="@color/white"
@@ -53,14 +53,14 @@
                     android:elevation="2dp" />
             </LinearLayout>
 
-            <!-- Contract Details Section -->
+            <!-- Payable Details Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Contract Length -->
+                <!-- Start Date -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -71,21 +71,21 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Length:"
+                        android:text="Start Date:"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvContractLength"
+                        android:id="@+id/tvStartDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10 months"
+                        android:text="September 1, 2025"
                         android:textSize="14sp"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
-                <!-- Created Date -->
+                <!-- Due Date -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -96,21 +96,72 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Created:"
+                        android:text="Due Date:"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvCreatedAt"
+                        android:id="@+id/tvDueDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="April 15, 2025"
+                        android:text="September 30, 2025"
                         android:textSize="14sp"
                         android:textColor="@color/text_primary" />
                 </LinearLayout>
 
-                <!-- Overdue Items -->
+                <!-- Full Amount -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Full Amount:"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvFullAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹25,000"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Total Paid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total Paid:"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTotalPaid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹15,000"
+                        android:textSize="14sp"
+                        android:textColor="@color/primary_blue" />
+                </LinearLayout>
+
+                <!-- Left to Pay -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -120,18 +171,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Pre-Contract Overdue:"
+                        android:text="Left to Pay:"
                         android:textSize="14sp"
                         android:textColor="@color/text_secondary"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvOverdueItems"
+                        android:id="@+id/tvLeftToPay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="3 items"
+                        android:text="₹10,000"
                         android:textSize="14sp"
-                        android:textColor="@color/error_red" />
+                        android:textColor="@color/error_red"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -141,13 +193,14 @@
                 android:id="@+id/btnViewBills"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Bills"
+                android:text="View Payments"
                 android:textStyle="bold"
                 android:layout_gravity="end"
                 android:backgroundTint="@color/primary_blue"
                 android:textColor="@color/white"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="16dp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>
