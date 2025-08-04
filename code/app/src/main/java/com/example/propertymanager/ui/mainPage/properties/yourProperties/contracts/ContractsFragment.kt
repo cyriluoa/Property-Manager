@@ -79,10 +79,7 @@ class ContractsFragment : Fragment() {
     }
 
     private fun setupInactiveRecycler() {
-        inactiveAdapter = ContractAdapter{ selectedContract ->
-            onContractClick
-
-        }
+        inactiveAdapter = ContractAdapter(onContractClick)
         binding.rvInactiveContracts.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = inactiveAdapter

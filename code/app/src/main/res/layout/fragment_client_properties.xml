@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
@@ -9,7 +8,7 @@
         android:orientation="vertical"
         android:background="@color/background_light">
 
-        <!-- Header -->
+        <!-- Static Header -->
         <TextView
             android:id="@+id/tv_header"
             android:layout_width="match_parent"
@@ -23,13 +22,21 @@
             android:background="@drawable/header_gradient_bg"
             android:elevation="4dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_contracts"
-            android:paddingTop="30dp"
+        <!-- SwipeRefresh wraps only the scrollable content -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            tools:listitem="@layout/item_client_property_contract_card"/>
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_contracts"
+                android:paddingTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_client_property_contract_card"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
     </LinearLayout>
 </layout>

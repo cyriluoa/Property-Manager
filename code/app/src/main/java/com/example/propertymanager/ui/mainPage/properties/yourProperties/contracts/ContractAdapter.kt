@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -42,6 +43,7 @@ class ContractAdapter(
             binding.tvContractStatus.setBackgroundResource(badgeRes)
 
             binding.btnViewBills.setOnClickListener {
+                Log.d("ContractAdapter","Button clicked")
                 onViewPaymentsClick(contract)
             }
         }

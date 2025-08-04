@@ -12,8 +12,9 @@ import com.example.propertymanager.R
 import com.example.propertymanager.data.model.ClientPropertyContract
 import com.example.propertymanager.databinding.ItemClientPropertyContractCardBinding
 
-class ClientPropertiesAdapter :
-    ListAdapter<ClientPropertyContract, ClientPropertiesAdapter.ContractViewHolder>(DiffCallback()) {
+class ClientPropertiesAdapter(
+    private val onViewBillsClick: (ClientPropertyContract) -> Unit
+) : ListAdapter<ClientPropertyContract, ClientPropertiesAdapter.ContractViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContractViewHolder {
         val binding = ItemClientPropertyContractCardBinding.inflate(
@@ -56,6 +57,10 @@ class ClientPropertiesAdapter :
             } else {
                 ivPropertyImage.visibility = View.GONE
                 llNoImageOverlay.visibility = View.VISIBLE
+            }
+
+            binding.btnViewBills.setOnClickListener {
+                onViewBillsClick(contract)
             }
         }
     }

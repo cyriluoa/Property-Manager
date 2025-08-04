@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
     <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -302,7 +301,28 @@
 
                 </LinearLayout>
 
+
+
+
             </LinearLayout>
+            <!-- View Bills Button -->
+            <Button
+                android:id="@+id/btn_view_bills"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:minWidth="120dp"
+                android:text="View Bills"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:backgroundTint="@color/primary_blue"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="6dp"
+                android:layout_marginEnd="6dp"
+                android:padding="12dp"
+                android:textStyle="bold" />
+
+
 
         </LinearLayout>
 
