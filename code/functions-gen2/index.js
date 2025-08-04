@@ -3,6 +3,10 @@ const { logger } = require("firebase-functions");
 const admin = require("firebase-admin");
 const moment = require("moment-timezone");
 
+const { onCall } = require("firebase-functions/v2/https");
+const { getClientContracts } = require("./https/getClientContracts");
+
+
 admin.initializeApp();
 
 // 1. Activate contracts at start date
@@ -383,3 +387,9 @@ function shouldUpdateStatus(itemDateStr) {
 
   return today.isSameOrAfter(itemDate);
 }
+
+
+exports.getClientContracts = getClientContracts;
+
+
+

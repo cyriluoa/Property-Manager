@@ -7,5 +7,6 @@ enum class ContractState {
     NOT_ACCEPTED_IN_TIME,
     ACTIVE,
     CANCELLED,
-    OVER
+    OVER,
+    COMPLETELY_PAID_OFF
 }

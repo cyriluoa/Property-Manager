@@ -1,9 +1,13 @@
 package com.example.propertymanager.data.firebase
 
 
+import android.util.Log
+import com.example.propertymanager.data.model.ClientPropertyContract
 import com.example.propertymanager.data.model.Property
 import com.example.propertymanager.data.model.PropertyState
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.functions.functions
 import jakarta.inject.Inject
 import javax.inject.Singleton
 
@@ -90,5 +94,42 @@ class PropertyManager  @Inject constructor(): FirestoreManager(){
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun fetchClientPropertyContractsFromCloudFunction(
+        onComplete: (List<ClientPropertyContract>) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        val functions = Firebase.functions
+
+        functions
+            .getHttpsCallable("getClientContracts")
+            .call()  // No need to pass data since it uses request.auth.uid
+            .addOnSuccessListener { result ->
+                try {
+                    val data = result.data as? List<Map<String, Any>> ?: emptyList()
+                    val contracts = data.mapNotNull { map ->
+                        try {
+                            ClientPropertyContract.fromMap(map)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    Log.d("fetchClientContracts", "Fetched ${contracts.size} contracts")
+
+                    onComplete(contracts)
+                } catch (e: Exception) {
+                    onError(e)
+                }
+            }
+            .addOnFailureListener { e ->
+                onError(e)
+            }
+    }
+
+
+
+
+
+
 
 }

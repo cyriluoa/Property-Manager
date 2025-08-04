@@ -6,10 +6,12 @@ import com.example.propertymanager.data.firebase.ContractManager
 import com.example.propertymanager.data.firebase.PayableItemManager
 import com.example.propertymanager.data.firebase.PropertyManager
 import com.example.propertymanager.data.firebase.UserManager
+import com.example.propertymanager.data.model.ClientPropertyContract
 import com.example.propertymanager.data.model.ClientRequest
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.DisplayProperty
 import com.example.propertymanager.data.model.Property
+import com.google.firebase.firestore.ListenerRegistration
 import jakarta.inject.Inject
 import javax.inject.Singleton
 
@@ -127,4 +129,12 @@ class PropertyRepository @Inject constructor(
             }
         }, onError)
     }
+
+    fun fetchClientPropertyContracts(
+        onComplete: (List<ClientPropertyContract>) -> Unit,
+        onError: (Exception) -> Unit
+    ){
+        return propertyManager.fetchClientPropertyContractsFromCloudFunction(onComplete,onError)
+    }
+
 }
