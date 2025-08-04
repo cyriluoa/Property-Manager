@@ -105,10 +105,13 @@
 
                         <!-- Active Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardActiveContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="4dp"
                             app:strokeColor="@color/success_green"
@@ -150,11 +153,14 @@
 
                         <!-- Fully Paid Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardPaidOffContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             app:cardCornerRadius="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardElevation="4dp"
                             app:strokeColor="@color/success_green"
                             app:strokeWidth="2dp">
@@ -194,10 +200,13 @@
 
                         <!-- Accepted Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardAcceptedContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="4dp"
                             app:strokeColor="@color/success_green"
@@ -248,11 +257,14 @@
 
                         <!-- Expired Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardExpiredContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
                             app:cardCornerRadius="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardElevation="4dp"
                             app:strokeColor="@color/error_red"
                             app:strokeWidth="2dp">
@@ -291,10 +303,13 @@
 
                         <!-- Cancelled Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardCancelledContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="4dp"
                             app:strokeColor="@color/error_red"
@@ -335,9 +350,12 @@
 
                         <!-- Denied Contracts -->
                         <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/cardDeniedContracts"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:layout_marginEnd="4dp"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="4dp"

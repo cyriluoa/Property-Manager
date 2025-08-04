@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.mainPage.payments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.propertymanager.databinding.FragmentPaymentsBinding
+import com.example.propertymanager.ui.mainPage.payments.client.ClientActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -33,6 +35,7 @@ class PaymentsFragment : Fragment() {
         setupObservers()
         setupRefresh()
         viewModel.refreshClientContracts()
+        setupClickListeners()
 
         binding.cardViewAllContracts.setOnClickListener {
             Toast.makeText(requireContext(), "View All Properties clicked", Toast.LENGTH_SHORT).show()
@@ -79,6 +82,34 @@ class PaymentsFragment : Fragment() {
             Toast.makeText(requireContext(), "Error: ${exception.message}", Toast.LENGTH_LONG).show()
         }
     }
+
+    private fun setupClickListeners() {
+        binding.cardActiveContracts.setOnClickListener {
+            openClientContractsActivity("ACTIVE")
+        }
+        binding.cardAcceptedContracts.setOnClickListener {
+            openClientContractsActivity("ACCEPTED")
+        }
+        binding.cardCancelledContracts.setOnClickListener {
+            openClientContractsActivity("CANCELLED")
+        }
+        binding.cardDeniedContracts.setOnClickListener {
+            openClientContractsActivity("DENIED")
+        }
+        binding.cardExpiredContracts.setOnClickListener {
+            openClientContractsActivity("EXPIRED")
+        }
+        binding.cardPaidOffContracts.setOnClickListener {
+            openClientContractsActivity("PAID_OFF")
+        }
+    }
+
+    private fun openClientContractsActivity(state: String) {
+        val intent = Intent(requireContext(), ClientActivity::class.java)
+        intent.putExtra("CONTRACT_STATE", state)
+        startActivity(intent)
+    }
+
 
 
     private fun setupRefresh() {

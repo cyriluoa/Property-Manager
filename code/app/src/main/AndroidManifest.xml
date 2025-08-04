@@ -51,6 +51,7 @@
             android:windowSoftInputMode="adjustResize|stateHidden"
             android:exported="true" />
         <activity android:name=".ui.mainPage.profile.requests.RequestsActivity"/>
+        <activity android:name=".ui.mainPage.payments.client.ClientActivity"/>
         <service
             android:name=".messaging.MyFirebaseMessagingService"
             android:exported="false">

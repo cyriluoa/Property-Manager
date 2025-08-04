@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,6 +11,7 @@
 
         <!-- Header -->
         <TextView
+            android:id="@+id/tv_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Properties that you rent"
@@ -21,186 +23,13 @@
             android:background="@drawable/header_gradient_bg"
             android:elevation="4dp" />
 
-        <!-- Main Content with NestedScrollView -->
-        <androidx.core.widget.NestedScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_contracts"
+            android:paddingTop="30dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="16dp"
-            android:fillViewport="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Active Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Active Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/success_green"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoActiveContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No active contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvActiveContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Accepted (Not Active) Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Accepted Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary_blue"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoAcceptedContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No accepted contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvAcceptedContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Over Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Expired Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/medium_blue"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoOverContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No expired contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvOverContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Completely Paid Off Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Fully Paid Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/success_green"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoPaidOffContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No fully paid contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvPaidOffContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Cancelled Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Cancelled Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/error_red"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoCancelledContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No cancelled contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvCancelledContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never"
-                    android:layout_marginBottom="24dp" />
-
-                <!-- Denied Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Denied Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/error_red"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvNoDeniedContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No denied contracts"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvDeniedContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:overScrollMode="never" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+            android:clipToPadding="false"
+            tools:listitem="@layout/item_client_property_contract_card"/>
     </LinearLayout>
 </layout>
