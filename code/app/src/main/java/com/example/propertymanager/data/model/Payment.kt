@@ -15,5 +15,8 @@ data class Payment(
     val proofUrl: String? = null,
     val notes: String = "",
     val paymentState: PaymentState = PaymentState.PENDING,
+    val propertyName: String = "", // NEW
+    val paymentLabel: String = "", // NEW
 ) : Parcelable
+
 

@@ -8,8 +8,11 @@ import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.propertymanager.R
+import com.example.propertymanager.data.model.Payment
+import com.example.propertymanager.data.model.PaymentState
 import com.example.propertymanager.databinding.FragmentMakePaymentBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.image.UploadImageFragment
@@ -23,6 +26,8 @@ class MakePaymentFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
+
+    private val viewModel: PaymentViewModel by viewModels()
 
 
 
@@ -53,6 +58,11 @@ class MakePaymentFragment : Fragment() {
         requireArguments().getString(ARG_PROPERTY_NAME) ?: error("Missing propertyName")
     }
 
+    private val paymentLabel: String by lazy {
+        requireArguments().getString(ARG_PAYMENT_LABEL) ?: error("Missing paymentLabel")
+    }
+
+
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_CONTRACT_ID = "contract_id"
@@ -63,6 +73,8 @@ class MakePaymentFragment : Fragment() {
         private const val ARG_OWNER_ID = "owner_id"
         private const val ARG_PROPERTY_NAME = "property_name"
 
+        private const val ARG_PAYMENT_LABEL = "payment_label"
+
         fun newInstance(
             propertyId: String,
             contractId: String,
@@ -70,7 +82,8 @@ class MakePaymentFragment : Fragment() {
             amountLeft: Double,
             clientId: String,
             ownerId: String,
-            propertyName: String
+            propertyName: String,
+            paymentLabel: String // <-- NEW
         ): MakePaymentFragment {
             return MakePaymentFragment().apply {
                 arguments = Bundle().apply {
@@ -81,9 +94,11 @@ class MakePaymentFragment : Fragment() {
                     putString(ARG_CLIENT_ID, clientId)
                     putString(ARG_OWNER_ID, ownerId)
                     putString(ARG_PROPERTY_NAME, propertyName)
+                    putString(ARG_PAYMENT_LABEL, paymentLabel) // <-- NEW
                 }
             }
         }
+
 
     }
 
@@ -99,8 +114,32 @@ class MakePaymentFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvAmountLeft.text = "₹${amountLeft}"
+        binding.tvPropertyName.text = "${propertyName}"
 
         setupListeners()
+        observeViewModel()
+
+
+
+
+    }
+
+    private fun observeViewModel() {
+        viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.btnSubmitPayment.isEnabled = !isLoading
+        }
+
+        viewModel.paymentResult.observe(viewLifecycleOwner) { result ->
+            result.onSuccess {
+                Toast.makeText(requireContext(), "Payment submitted successfully", Toast.LENGTH_SHORT).show()
+                parentFragmentManager.popBackStack() // Or navigate somewhere
+            }
+
+            result.onFailure { error ->
+                Toast.makeText(requireContext(), "Failed: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        }
 
         imageSharedViewModel.imageUri.observe(viewLifecycleOwner) { uri ->
             uri?.let {
@@ -113,8 +152,8 @@ class MakePaymentFragment : Fragment() {
                 binding.cardImagePreview.visibility = View.GONE
             }
         }
-
     }
+
 
     private fun setupListeners() {
         val amountEditText = binding.etPaymentAmount
@@ -161,8 +200,22 @@ class MakePaymentFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Proceed to create and upload the Payment object
-            // TODO: Add Firebase write logic here
+            val proofUrl = imageSharedViewModel.imageUrl.value
+
+            val payment = Payment(
+                amountPaid = input,
+                clientId = clientId,
+                ownerId = ownerId,
+                proofUrl = proofUrl,
+                notes = binding.etNotes.text.toString(),
+                paymentState = PaymentState.PENDING,
+                propertyName = propertyName,
+                paymentLabel = paymentLabel
+            )
+
+            viewModel.makePayment(payment, propertyId, contractId, payableItemId)
+
+
         }
 
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
 import com.example.propertymanager.data.model.Mode
+import com.example.propertymanager.data.model.PayableItemType
 import com.example.propertymanager.databinding.FragmentPayableItemsBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.mainPage.payments.client.payments.MakePaymentFragment
@@ -103,6 +104,13 @@ class PayableItemsFragment : Fragment() {
             mode,
             onViewPaymentsClicked = { /* handle view */ },
             onMakePaymentClicked = { payableItem ->
+
+                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
+                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
+                } else {
+                    "Month ${payableItem.monthIndex?.plus(1)}"
+                }
+
                 val fragment = MakePaymentFragment.newInstance(
                     propertyId = propertyId,
                     contractId = contractId,
@@ -110,7 +118,8 @@ class PayableItemsFragment : Fragment() {
                     amountLeft = payableItem.amountDue - payableItem.totalPaid,
                     clientId = clientId,
                     ownerId = ownerId,
-                    propertyName = propertyName
+                    propertyName = propertyName,
+                    paymentLabel = label
                 )
 
 
@@ -131,6 +140,12 @@ class PayableItemsFragment : Fragment() {
             mode,
             onViewPaymentsClicked = { /* handle view */ },
             onMakePaymentClicked = { payableItem ->
+                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
+                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
+                } else {
+                    "Month ${payableItem.monthIndex?.plus(1)}"
+                }
+
                 val fragment = MakePaymentFragment.newInstance(
                     propertyId = propertyId,
                     contractId = contractId,
@@ -138,7 +153,8 @@ class PayableItemsFragment : Fragment() {
                     amountLeft = payableItem.amountDue - payableItem.totalPaid,
                     clientId = clientId,
                     ownerId = ownerId,
-                    propertyName = propertyName
+                    propertyName = propertyName,
+                    paymentLabel = label
                 )
                 parentFragmentManager.beginTransaction()
                     .setCustomAnimations(
