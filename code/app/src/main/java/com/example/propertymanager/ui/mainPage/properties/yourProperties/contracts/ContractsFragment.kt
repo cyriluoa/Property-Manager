@@ -31,26 +31,47 @@ class ContractsFragment : Fragment() {
         requireArguments().getString(ARG_PROPERTY_ID) ?: error("Property ID not passed")
     }
 
+    private val propertyName: String by lazy {
+        requireArguments().getString(ARG_PROPERTY_NAME) ?: error("Property Name not passed")
+    }
+
+    private val ownerId: String by lazy {
+        requireArguments().getString(ARG_OWNER_ID) ?: error("Owner ID not passed")
+    }
+
+
 
 
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
+        private const val ARG_PROPERTY_NAME = "property_name"
+        private const val ARG_OWNER_ID = "owner_id"
 
-        fun newInstance(propertyId: String): ContractsFragment {
-            val fragment = ContractsFragment()
-            fragment.arguments = Bundle().apply {
-                putString(ARG_PROPERTY_ID, propertyId)
+        fun newInstance(propertyId: String, propertyName: String, ownerId: String): ContractsFragment {
+            return ContractsFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PROPERTY_ID, propertyId)
+                    putString(ARG_PROPERTY_NAME, propertyName)
+                    putString(ARG_OWNER_ID, ownerId)
+                }
             }
-            return fragment
         }
     }
+
 
     private lateinit var inactiveAdapter: ContractAdapter
 
     private val onContractClick: (Contract) -> Unit = { selectedContract ->
         Log.d("ContractsFragment", "View bills clicked for contract: ${selectedContract.id}")
 
-        val fragment = PayableItemsFragment.newInstance(propertyId, selectedContract.id, Mode.OWNER_MODE)
+        val fragment = PayableItemsFragment.newInstance(
+            propertyId = propertyId,
+            contractId = selectedContract.id,
+            mode = Mode.OWNER_MODE,
+            ownerId = ownerId,
+            clientId = selectedContract.clientId,
+            propertyName = propertyName
+        )
 
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(

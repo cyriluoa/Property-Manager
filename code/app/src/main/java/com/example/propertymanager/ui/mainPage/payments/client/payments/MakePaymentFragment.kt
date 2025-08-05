@@ -25,6 +25,8 @@ class MakePaymentFragment : Fragment() {
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
 
 
+
+
     private val propertyId: String by lazy {
         requireArguments().getString(ARG_PROPERTY_ID) ?: error("Missing propertyId")
     }
@@ -41,17 +43,34 @@ class MakePaymentFragment : Fragment() {
         requireArguments().getDouble(ARG_AMOUNT_LEFT)
     }
 
+    private val clientId: String by lazy {
+        requireArguments().getString(ARG_CLIENT_ID) ?: error("Missing clientId")
+    }
+    private val ownerId: String by lazy {
+        requireArguments().getString(ARG_OWNER_ID) ?: error("Missing ownerId")
+    }
+    private val propertyName: String by lazy {
+        requireArguments().getString(ARG_PROPERTY_NAME) ?: error("Missing propertyName")
+    }
+
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_CONTRACT_ID = "contract_id"
         private const val ARG_PAYABLE_ITEM_ID = "payable_item_id"
         private const val ARG_AMOUNT_LEFT = "amount_left"
 
+        private const val ARG_CLIENT_ID = "client_id"
+        private const val ARG_OWNER_ID = "owner_id"
+        private const val ARG_PROPERTY_NAME = "property_name"
+
         fun newInstance(
             propertyId: String,
             contractId: String,
             payableItemId: String,
-            amountLeft: Double
+            amountLeft: Double,
+            clientId: String,
+            ownerId: String,
+            propertyName: String
         ): MakePaymentFragment {
             return MakePaymentFragment().apply {
                 arguments = Bundle().apply {
@@ -59,9 +78,13 @@ class MakePaymentFragment : Fragment() {
                     putString(ARG_CONTRACT_ID, contractId)
                     putString(ARG_PAYABLE_ITEM_ID, payableItemId)
                     putDouble(ARG_AMOUNT_LEFT, amountLeft)
+                    putString(ARG_CLIENT_ID, clientId)
+                    putString(ARG_OWNER_ID, ownerId)
+                    putString(ARG_PROPERTY_NAME, propertyName)
                 }
             }
         }
+
     }
 
     override fun onCreateView(

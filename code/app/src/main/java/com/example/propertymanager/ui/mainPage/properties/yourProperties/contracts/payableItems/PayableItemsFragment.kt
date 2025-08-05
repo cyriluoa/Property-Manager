@@ -41,22 +41,45 @@ class PayableItemsFragment : Fragment() {
         Mode.valueOf(requireArguments().getString(ARG_MODE) ?: Mode.CLIENT_MODE.name)
     }
 
+    private val ownerId: String by lazy {
+        requireArguments().getString(ARG_OWNER_ID) ?: error("Missing ownerId")
+    }
+    private val clientId: String by lazy {
+        requireArguments().getString(ARG_CLIENT_ID) ?: error("Missing clientId")
+    }
+    private val propertyName: String by lazy {
+        requireArguments().getString(ARG_PROPERTY_NAME) ?: error("Missing propertyName")
+    }
+
 
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_CONTRACT_ID = "contract_id"
-
         private const val ARG_MODE = "mode"
+        private const val ARG_OWNER_ID = "owner_id"
+        private const val ARG_CLIENT_ID = "client_id"
+        private const val ARG_PROPERTY_NAME = "property_name"
 
-        fun newInstance(propertyId: String, contractId: String, mode: Mode): PayableItemsFragment {
+        fun newInstance(
+            propertyId: String,
+            contractId: String,
+            mode: Mode,
+            ownerId: String,
+            clientId: String,
+            propertyName: String
+        ): PayableItemsFragment {
             return PayableItemsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PROPERTY_ID, propertyId)
                     putString(ARG_CONTRACT_ID, contractId)
                     putString(ARG_MODE, mode.name)
+                    putString(ARG_OWNER_ID, ownerId)
+                    putString(ARG_CLIENT_ID, clientId)
+                    putString(ARG_PROPERTY_NAME, propertyName)
                 }
             }
         }
+
 
     }
 
@@ -84,8 +107,12 @@ class PayableItemsFragment : Fragment() {
                     propertyId = propertyId,
                     contractId = contractId,
                     payableItemId = payableItem.id,
-                    amountLeft = payableItem.amountDue - payableItem.totalPaid
+                    amountLeft = payableItem.amountDue - payableItem.totalPaid,
+                    clientId = clientId,
+                    ownerId = ownerId,
+                    propertyName = propertyName
                 )
+
 
                 imageSharedViewModel.clear()
                 parentFragmentManager.beginTransaction()
@@ -108,7 +135,10 @@ class PayableItemsFragment : Fragment() {
                     propertyId = propertyId,
                     contractId = contractId,
                     payableItemId = payableItem.id,
-                    amountLeft = payableItem.amountDue - payableItem.totalPaid
+                    amountLeft = payableItem.amountDue - payableItem.totalPaid,
+                    clientId = clientId,
+                    ownerId = ownerId,
+                    propertyName = propertyName
                 )
                 parentFragmentManager.beginTransaction()
                     .setCustomAnimations(

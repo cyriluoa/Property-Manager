@@ -41,7 +41,11 @@ class PropertyListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = PropertyListAdapter { clickedItem ->
-            val fragment = ContractsFragment.newInstance(clickedItem.propertyId)
+            val fragment = ContractsFragment.newInstance(
+                propertyId = clickedItem.propertyId,
+                propertyName = clickedItem.propertyName,
+                ownerId = clickedItem.ownerId
+            )
 
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(

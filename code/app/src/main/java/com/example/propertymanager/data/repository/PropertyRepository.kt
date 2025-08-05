@@ -94,7 +94,8 @@ class PropertyRepository @Inject constructor(
                                         status = status,
                                         currentClientName = clientName,
                                         dueThisMonth = 0.0,
-                                        totalDue = 0.0
+                                        totalDue = 0.0,
+                                        ownerId = property.ownerId
                                     )
                                 )
                                 completed++
@@ -120,7 +121,8 @@ class PropertyRepository @Inject constructor(
                             status = "VACANT",
                             currentClientName = "-",
                             dueThisMonth = 0.0,
-                            totalDue = 0.0
+                            totalDue = 0.0,
+                            ownerId = property.ownerId
                         )
                     )
                     completed++

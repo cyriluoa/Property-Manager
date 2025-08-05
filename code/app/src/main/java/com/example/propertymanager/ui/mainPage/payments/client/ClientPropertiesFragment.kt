@@ -53,7 +53,10 @@ class ClientPropertiesFragment : Fragment() {
             val fragment = PayableItemsFragment.newInstance(
                 propertyId = selectedContract.propertyId,
                 contractId = selectedContract.contractId,
-                Mode.CLIENT_MODE
+                mode = Mode.CLIENT_MODE,
+                ownerId = selectedContract.ownerId,
+                clientId = selectedContract.clientId,
+                propertyName = selectedContract.propertyName
             )
 
             parentFragmentManager.beginTransaction()
