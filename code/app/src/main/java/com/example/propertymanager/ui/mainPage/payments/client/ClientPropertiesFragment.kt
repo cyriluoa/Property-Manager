@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
+import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentClientPropertiesBinding
 import com.example.propertymanager.ui.mainPage.payments.PaymentsViewModel
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.payableItems.PayableItemsFragment
@@ -51,7 +52,8 @@ class ClientPropertiesFragment : Fragment() {
             // Handle click
             val fragment = PayableItemsFragment.newInstance(
                 propertyId = selectedContract.propertyId,
-                contractId = selectedContract.contractId
+                contractId = selectedContract.contractId,
+                Mode.CLIENT_MODE
             )
 
             parentFragmentManager.beginTransaction()

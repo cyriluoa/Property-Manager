@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableState
 import com.example.propertymanager.databinding.ItemPayableItemBinding
@@ -16,14 +17,15 @@ import java.text.NumberFormat
 import java.util.*
 
 class PayableItemAdapter(
-    private val onViewPaymentsClicked: (PayableItem) -> Unit
+    private val mode: Mode,
+    private val onViewPaymentsClicked: (PayableItem) -> Unit,
+    private val onMakePaymentClicked: (PayableItem) -> Unit
 ) : ListAdapter<PayableItem, PayableItemAdapter.PayableViewHolder>(DiffCallback()) {
 
     inner class PayableViewHolder(private val binding: ItemPayableItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: PayableItem) = with(binding) {
-
             tvPayableTitle.text = when (item.type.name) {
                 "MONTHLY" -> "Month ${item.monthIndex?.plus(1) ?: "-"} Rent"
                 "PRE_CONTRACT_OVERDUE" -> item.overdueItemLabel ?: "Pre-contract Dues"
@@ -33,17 +35,40 @@ class PayableItemAdapter(
             tvPayableStatus.text = item.status.name
             tvStartDate.text = item.startDate
             tvDueDate.text = item.dueDate
-            tvFullAmount.text = item.amountDue.toString() + " INR"
-            tvTotalPaid.text = item.totalPaid.toString() + " INR"
-            tvLeftToPay.text = (item.amountDue - item.totalPaid).toString() + " INR"
+            tvFullAmount.text = "${item.amountDue} INR"
+            tvTotalPaid.text = "${item.totalPaid} INR"
+            tvLeftToPay.text = "${item.amountDue - item.totalPaid} INR"
 
-            btnViewBills.visibility =
-                if (item.status == PayableState.NOT_APPLIED_YET) View.GONE else View.VISIBLE
+            // Visibility logic
+            val state = item.status
 
+            if (state == PayableState.NOT_APPLIED_YET) {
+                btnViewBills.visibility = View.GONE
+                btnMakePayment.visibility = View.GONE
+            } else {
+                btnViewBills.visibility = View.VISIBLE
+
+                if (mode == Mode.CLIENT_MODE) {
+                    btnMakePayment.visibility = when (state) {
+                        PayableState.DUE, PayableState.OVERDUE -> View.VISIBLE
+                        else -> View.GONE
+                    }
+                } else {
+                    btnMakePayment.visibility = View.GONE
+                }
+            }
+
+            // Click listeners
             btnViewBills.setOnClickListener {
                 onViewPaymentsClicked(item)
             }
+
+            btnMakePayment.setOnClickListener {
+                onMakePaymentClicked(item)
+            }
         }
+
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PayableViewHolder {

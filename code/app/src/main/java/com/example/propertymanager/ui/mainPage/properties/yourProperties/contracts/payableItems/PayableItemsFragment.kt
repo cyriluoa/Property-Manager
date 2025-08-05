@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentPayableItemsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -29,18 +30,27 @@ class PayableItemsFragment : Fragment() {
         requireArguments().getString(ARG_CONTRACT_ID) ?: error("Missing contractId")
     }
 
+    private val mode: Mode by lazy {
+        Mode.valueOf(requireArguments().getString(ARG_MODE) ?: Mode.CLIENT_MODE.name)
+    }
+
+
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_CONTRACT_ID = "contract_id"
 
-        fun newInstance(propertyId: String, contractId: String): PayableItemsFragment {
+        private const val ARG_MODE = "mode"
+
+        fun newInstance(propertyId: String, contractId: String, mode: Mode): PayableItemsFragment {
             return PayableItemsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PROPERTY_ID, propertyId)
                     putString(ARG_CONTRACT_ID, contractId)
+                    putString(ARG_MODE, mode.name)
                 }
             }
         }
+
     }
 
     override fun onCreateView(
@@ -59,13 +69,18 @@ class PayableItemsFragment : Fragment() {
     }
 
     private fun setupAdapters() {
-        monthlyAdapter = PayableItemAdapter {
-            // TODO: Handle view payments click for monthly rent
-        }
+        monthlyAdapter = PayableItemAdapter(
+            mode,
+            onViewPaymentsClicked = { /* handle view */ },
+            onMakePaymentClicked = { /* handle make payment */ }
+        )
 
-        overdueAdapter = PayableItemAdapter {
-            // TODO: Handle view payments click for overdue items
-        }
+        overdueAdapter = PayableItemAdapter(
+            mode,
+            onViewPaymentsClicked = { /* handle view */ },
+            onMakePaymentClicked = { /* handle make payment */ }
+        )
+
 
         binding.rvMonthlyRent.apply {
             layoutManager = LinearLayoutManager(requireContext())

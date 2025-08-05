@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
 import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentContractsBinding
 import com.example.propertymanager.databinding.ItemContractBinding
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.payableItems.PayableItemsFragment
@@ -49,7 +50,7 @@ class ContractsFragment : Fragment() {
     private val onContractClick: (Contract) -> Unit = { selectedContract ->
         Log.d("ContractsFragment", "View bills clicked for contract: ${selectedContract.id}")
 
-        val fragment = PayableItemsFragment.newInstance(propertyId, selectedContract.id)
+        val fragment = PayableItemsFragment.newInstance(propertyId, selectedContract.id, Mode.OWNER_MODE)
 
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(

@@ -188,19 +188,46 @@
 
             </LinearLayout>
 
-            <!-- View Payments Button -->
-            <Button
-                android:id="@+id/btnViewBills"
-                android:layout_width="wrap_content"
+            <!-- Action Buttons Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Payments"
-                android:textStyle="bold"
-                android:layout_gravity="end"
-                android:backgroundTint="@color/primary_blue"
-                android:textColor="@color/white"
+                android:orientation="horizontal"
+                android:gravity="end"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:gap="12dp">
+
+                <!-- View Payments Button -->
+                <Button
+                    android:id="@+id/btnViewBills"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="View Payments"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/primary_blue"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="10dp" />
+
+                <!-- Make Payment Button (Visible in CLIENT_MODE only) -->
+                <Button
+                    android:id="@+id/btnMakePayment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Make Payment"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/success_green"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="10dp"
+                    android:textSize="14sp"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="10dp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>
