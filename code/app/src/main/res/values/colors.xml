@@ -3,6 +3,7 @@
     <!-- Your Theme Colors -->
     <color name="background_light">#D1F8EF</color>
     <color name="accent_light_blue">#A1E3F9</color>
+    <color name="light_blue">#E3F2FD</color>
     <color name="medium_blue">#578FCA</color>
     <color name="primary_blue">#3674B5</color>
 
@@ -17,6 +18,7 @@
     <color name="white">#FFFFFF</color>
     <color name="text_primary">#2C3E50</color>
     <color name="text_secondary">#7F8C8D</color>
+    <color name="divider_color">#E0E0E0</color>
     <color name="success_green">#27AE60</color>
     <color name="error_red">#E74C3C</color>
     <color name="light_gray">#F8F9FA</color>

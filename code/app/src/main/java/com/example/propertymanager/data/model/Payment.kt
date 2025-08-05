@@ -11,10 +11,9 @@ data class Payment(
     val amountPaid: Double = 0.0,
     val timestamp: Timestamp = Timestamp.now(),
     val clientId: String = "",
+    val ownerId: String = "",
     val proofUrl: String? = null,
-    val referenceNumber: String? = null,
-    val verified: Boolean = false,
     val notes: String = "",
-    val ownerId: String = ""
+    val paymentState: PaymentState = PaymentState.PENDING,
 ) : Parcelable
 

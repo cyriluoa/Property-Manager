@@ -5,10 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.propertymanager.R
 import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentPayableItemsBinding
+import com.example.propertymanager.ui.image.ImageSharedViewModel
+import com.example.propertymanager.ui.mainPage.payments.client.payments.MakePaymentFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,6 +25,9 @@ class PayableItemsFragment : Fragment() {
     private lateinit var overdueAdapter: PayableItemAdapter
 
     private val viewModel: PayableItemsViewModel by viewModels()
+
+    private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
+
 
     private val propertyId: String by lazy {
         requireArguments().getString(ARG_PROPERTY_ID) ?: error("Missing propertyId")
@@ -72,13 +79,46 @@ class PayableItemsFragment : Fragment() {
         monthlyAdapter = PayableItemAdapter(
             mode,
             onViewPaymentsClicked = { /* handle view */ },
-            onMakePaymentClicked = { /* handle make payment */ }
+            onMakePaymentClicked = { payableItem ->
+                val fragment = MakePaymentFragment.newInstance(
+                    propertyId = propertyId,
+                    contractId = contractId,
+                    payableItemId = payableItem.id,
+                    amountLeft = payableItem.amountDue - payableItem.totalPaid
+                )
+
+                imageSharedViewModel.clear()
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                    )
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+
         )
 
         overdueAdapter = PayableItemAdapter(
             mode,
             onViewPaymentsClicked = { /* handle view */ },
-            onMakePaymentClicked = { /* handle make payment */ }
+            onMakePaymentClicked = { payableItem ->
+                val fragment = MakePaymentFragment.newInstance(
+                    propertyId = propertyId,
+                    contractId = contractId,
+                    payableItemId = payableItem.id,
+                    amountLeft = payableItem.amountDue - payableItem.totalPaid
+                )
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                    )
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
         )
 
 

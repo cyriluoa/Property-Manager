@@ -11,4 +11,6 @@ object Constants {
     const val PATH_PROFILE_PICTURES = "profile_pictures"
 
     const val PATH_PROPERTIES = "properties"
+
+    const val PATH_PAYMENT_PROOFS = "payment_proofs"
 }
