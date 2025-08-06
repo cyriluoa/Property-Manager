@@ -17,6 +17,25 @@ class PaymentRepository @Inject constructor(
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        paymentManager.makePayment(payment, propertyId, contractId, payableItemId, onSuccess, onFailure)
+        paymentManager.makePayment(
+            payment,
+            propertyId,
+            contractId,
+            payableItemId,
+            onSuccess,
+            onFailure
+        )
     }
+
+    fun fetchPaymentsForPayableItem(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        onSuccess: (List<Payment>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        paymentManager.fetchPaymentsForPayableItem(propertyId, contractId, payableItemId, onSuccess, onFailure)
+    }
+
+
 }

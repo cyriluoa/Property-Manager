@@ -34,10 +34,10 @@ class ContractAdapter(
             binding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
 
             val badgeRes = when (contract.contractState.name) {
-                "ACTIVE" -> R.drawable.status_badge_vacant
-                "OVER" -> R.drawable.status_badge_vacant
-                "CANCELLED" -> R.drawable.status_badge_vacant
-                else -> R.drawable.status_badge_vacant
+                "ACTIVE" -> R.drawable.status_badge_yellow
+                "OVER" -> R.drawable.status_badge_yellow
+                "CANCELLED" -> R.drawable.status_badge_yellow
+                else -> R.drawable.status_badge_yellow
             }
 
             binding.tvContractStatus.setBackgroundResource(badgeRes)

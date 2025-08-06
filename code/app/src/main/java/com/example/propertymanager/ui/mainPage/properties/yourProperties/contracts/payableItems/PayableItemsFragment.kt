@@ -117,7 +117,8 @@ class PayableItemsFragment : Fragment() {
                     propertyName = propertyName,
                     paymentLabel = label,
                     clientId = clientId,
-                    ownerId = ownerId
+                    ownerId = ownerId,
+                    mode = mode
                 )
 
                 parentFragmentManager.beginTransaction()
@@ -179,7 +180,8 @@ class PayableItemsFragment : Fragment() {
                     propertyName = propertyName,
                     paymentLabel = label,
                     clientId = clientId,
-                    ownerId = ownerId
+                    ownerId = ownerId,
+                    mode = mode
                 )
 
                 parentFragmentManager.beginTransaction()

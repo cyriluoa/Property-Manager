@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.propertymanager.R
+import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentPaymentTabsBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -43,6 +44,10 @@ class FragmentPaymentTabs : Fragment() {
         requireArguments().getString(ARG_OWNER_ID) ?: error("Missing ownerId")
     }
 
+    private val mode: Mode by lazy {
+        Mode.valueOf(requireArguments().getString(ARG_MODE) ?: Mode.CLIENT_MODE.name)
+    }
+
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_CONTRACT_ID = "contract_id"
@@ -51,6 +56,7 @@ class FragmentPaymentTabs : Fragment() {
         private const val ARG_PAYMENT_LABEL = "payment_label"
         private const val ARG_CLIENT_ID = "client_id"
         private const val ARG_OWNER_ID = "owner_id"
+        private const val ARG_MODE = "mode"
 
         fun newInstance(
             propertyId: String,
@@ -59,7 +65,8 @@ class FragmentPaymentTabs : Fragment() {
             propertyName: String,
             paymentLabel: String,
             clientId: String,
-            ownerId: String
+            ownerId: String,
+            mode: Mode
         ): FragmentPaymentTabs {
             return FragmentPaymentTabs().apply {
                 arguments = Bundle().apply {
@@ -70,10 +77,12 @@ class FragmentPaymentTabs : Fragment() {
                     putString(ARG_PAYMENT_LABEL, paymentLabel)
                     putString(ARG_CLIENT_ID, clientId)
                     putString(ARG_OWNER_ID, ownerId)
+                    putString(ARG_MODE, mode.name)
                 }
             }
         }
     }
+
 
 
 
@@ -96,7 +105,7 @@ class FragmentPaymentTabs : Fragment() {
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 val color = ContextCompat.getColor(requireContext(), tabColors[tab.position])
-                binding.tabLayout.setTabTextColors(Color.GRAY, color)
+                binding.tabLayout.setTabTextColors(Color.WHITE, color)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}

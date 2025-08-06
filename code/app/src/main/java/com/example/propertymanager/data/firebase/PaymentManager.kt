@@ -36,4 +36,30 @@ class PaymentManager @Inject constructor(): FirestoreManager() {
             .addOnFailureListener { e -> onFailure(e) }
     }
 
+    fun fetchPaymentsForPayableItem(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        onSuccess: (List<Payment>) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val paymentsRef = db
+            .collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+            .document(payableItemId)
+            .collection("payments")
+
+        paymentsRef.get()
+            .addOnSuccessListener { snapshot ->
+                val payments = snapshot.documents.mapNotNull { it.toObject(Payment::class.java) }
+                onSuccess(payments)
+            }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
+
+
+
 }
