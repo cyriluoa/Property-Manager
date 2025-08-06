@@ -12,7 +12,10 @@ import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentPaymentTabsBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class FragmentPaymentTabs : Fragment() {
 
     private var _binding: FragmentPaymentTabsBinding? = null
@@ -22,13 +25,13 @@ class FragmentPaymentTabs : Fragment() {
     private val tabColors = listOf(R.color.warning_yellow, R.color.success_green, R.color.error_red)
 
 
-    private val propertyId: String by lazy {
+    val propertyId: String by lazy {
         requireArguments().getString(ARG_PROPERTY_ID) ?: error("Missing propertyId")
     }
-    private val contractId: String by lazy {
+    val contractId: String by lazy {
         requireArguments().getString(ARG_CONTRACT_ID) ?: error("Missing contractId")
     }
-    private val payableItemId: String by lazy {
+    val payableItemId: String by lazy {
         requireArguments().getString(ARG_PAYABLE_ITEM_ID) ?: error("Missing payableItemId")
     }
     private val propertyName: String by lazy {
@@ -44,7 +47,7 @@ class FragmentPaymentTabs : Fragment() {
         requireArguments().getString(ARG_OWNER_ID) ?: error("Missing ownerId")
     }
 
-    private val mode: Mode by lazy {
+    val mode: Mode by lazy {
         Mode.valueOf(requireArguments().getString(ARG_MODE) ?: Mode.CLIENT_MODE.name)
     }
 

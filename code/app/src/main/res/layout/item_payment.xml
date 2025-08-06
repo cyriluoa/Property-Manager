@@ -21,74 +21,53 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:background="@drawable/card_top_gradient"
-                android:padding="16dp">
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
 
-                <!-- Property Name and Status Row -->
+                <!-- Left: Paid Amount Column -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-
-                    <View
-                        android:layout_width="8dp"
-                        android:layout_height="8dp"
-                        android:background="@drawable/owner_icon_bg"
-                        android:layout_marginEnd="8dp" />
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Property: "
+                        android:text="Paid Amount"
                         android:textColor="@color/white"
                         android:textSize="14sp"
-                        android:alpha="0.9" />
+                        android:alpha="0.8" />
 
                     <TextView
-                        android:id="@+id/tv_property_name"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Luxury Villa Downtown"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-
-                    <TextView
-                        android:id="@+id/tv_payment_state"
+                        android:id="@+id/tv_amount_paid"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="PENDING"
+                        android:text="₹25,000.00"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
-                        android:background="@drawable/status_badge_yellow"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="6dp"
-                        android:layout_marginStart="12dp"
-                        android:elevation="2dp" />
-
+                        android:layout_marginTop="4dp" />
                 </LinearLayout>
 
-                <!-- Amount Paid - Most Important -->
+                <!-- Right: Status Badge -->
                 <TextView
-                    android:id="@+id/tv_amount_paid"
+                    android:id="@+id/tv_payment_state"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="₹25,000.00"
+                    android:text="PENDING"
                     android:textColor="@color/white"
-                    android:textSize="28sp"
+                    android:textSize="13sp"
                     android:textStyle="bold"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
+                    android:background="@drawable/status_badge_yellow"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
                     android:elevation="2dp" />
-
             </LinearLayout>
+
+
 
             <!-- Bottom Section with Details -->
             <LinearLayout

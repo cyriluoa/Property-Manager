@@ -37,10 +37,16 @@ class PaymentAdapter(
 
         fun bind(payment: Payment) {
             binding.apply {
-                tvPropertyName.text = payment.propertyName
                 tvAmountPaid.text = "₹${payment.amountPaid}"
                 tvTimestamp.text = formatDate(payment.timestamp)
-                tvNotes.text = payment.notes
+                if(payment.notes == ""){
+                    tvNotes.visibility = View.GONE
+                }
+                else{
+                    tvNotes.visibility = View.VISIBLE
+                    tvNotes.text = payment.notes
+                }
+
 
                 tvPaymentState.text = payment.paymentState.name
                 tvPaymentState.setBackgroundResource(getStatusBadge(payment.paymentState))
@@ -50,6 +56,12 @@ class PaymentAdapter(
                     layoutActionButtons.visibility = View.VISIBLE
                 } else {
                     layoutActionButtons.visibility = View.GONE
+                }
+                if(payment.proofUrl == null){
+                    btnViewImage.visibility = View.GONE
+                }
+                else{
+                    btnViewImage.visibility = View.VISIBLE
                 }
 
                 btnApprove.setOnClickListener { onApproveClicked(payment) }
