@@ -6,14 +6,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.repository.PayableItemRepository
+import com.example.propertymanager.data.repository.PaymentRepository
 import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 
 @HiltViewModel
 class PayableItemsViewModel @Inject constructor(
-    private val repository: PayableItemRepository
+    private val repository: PayableItemRepository,
+    private val paymentRepository: PaymentRepository
 ) : ViewModel() {
+
 
     private val _monthlyItems = MutableLiveData<List<PayableItem>>()
     val monthlyItems: LiveData<List<PayableItem>> = _monthlyItems
@@ -32,6 +35,25 @@ class PayableItemsViewModel @Inject constructor(
             onError = { Log.e("PayableItemsViewModel", "Listen error", it) }
         )
     }
+
+    fun checkPaymentsNotPending(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        onResult: (Boolean) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        paymentRepository.areAllPaymentsNotPending(
+            propertyId,
+            contractId,
+            payableItemId,
+            onResult,
+            onFailure
+        )
+    }
+
+
+
 
     override fun onCleared() {
         super.onCleared()

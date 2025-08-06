@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
 import com.example.propertymanager.data.model.Mode
+import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableItemType
 import com.example.propertymanager.databinding.FragmentPayableItemsBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
@@ -132,34 +134,7 @@ class PayableItemsFragment : Fragment() {
             }
             ,
             onMakePaymentClicked = { payableItem ->
-
-                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
-                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
-                } else {
-                    "Month ${payableItem.monthIndex?.plus(1)}'s Rent"
-                }
-
-                val fragment = MakePaymentFragment.newInstance(
-                    propertyId = propertyId,
-                    contractId = contractId,
-                    payableItemId = payableItem.id,
-                    amountLeft = payableItem.amountDue - payableItem.totalPaid,
-                    clientId = clientId,
-                    ownerId = ownerId,
-                    propertyName = propertyName,
-                    paymentLabel = label
-                )
-
-
-                imageSharedViewModel.clear()
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(
-                        R.anim.slide_in_right, R.anim.slide_out_left,
-                        R.anim.slide_in_left, R.anim.slide_out_right
-                    )
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit()
+                handleMakePaymentClick(payableItem)
             }
 
         )
@@ -195,30 +170,7 @@ class PayableItemsFragment : Fragment() {
             }
             ,
             onMakePaymentClicked = { payableItem ->
-                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
-                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
-                } else {
-                    "Month ${payableItem.monthIndex?.plus(1)}"
-                }
-
-                val fragment = MakePaymentFragment.newInstance(
-                    propertyId = propertyId,
-                    contractId = contractId,
-                    payableItemId = payableItem.id,
-                    amountLeft = payableItem.amountDue - payableItem.totalPaid,
-                    clientId = clientId,
-                    ownerId = ownerId,
-                    propertyName = propertyName,
-                    paymentLabel = label
-                )
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(
-                        R.anim.slide_in_right, R.anim.slide_out_left,
-                        R.anim.slide_in_left, R.anim.slide_out_right
-                    )
-                    .replace(R.id.fragment_container, fragment)
-                    .addToBackStack(null)
-                    .commit()
+                handleMakePaymentClick(payableItem)
             }
         )
 
@@ -233,6 +185,56 @@ class PayableItemsFragment : Fragment() {
             adapter = overdueAdapter
         }
     }
+
+
+    private fun handleMakePaymentClick(payableItem: PayableItem) {
+        viewModel.checkPaymentsNotPending(
+            propertyId,
+            contractId,
+            payableItem.id,
+            onResult = { allClear ->
+                if (!allClear) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Cannot make a new payment. A payment is still pending.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@checkPaymentsNotPending
+                }
+
+                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
+                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
+                } else {
+                    "Month ${payableItem.monthIndex?.plus(1)}'s Rent"
+                }
+
+                val fragment = MakePaymentFragment.newInstance(
+                    propertyId = propertyId,
+                    contractId = contractId,
+                    payableItemId = payableItem.id,
+                    amountLeft = payableItem.amountDue - payableItem.totalPaid,
+                    clientId = clientId,
+                    ownerId = ownerId,
+                    propertyName = propertyName,
+                    paymentLabel = label
+                )
+
+                imageSharedViewModel.clear()
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                    )
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            },
+            onFailure = {
+                Toast.makeText(requireContext(), "Failed to check payments.", Toast.LENGTH_LONG).show()
+            }
+        )
+    }
+
 
     private fun observeViewModel() {
         viewModel.monthlyItems.observe(viewLifecycleOwner) { items ->

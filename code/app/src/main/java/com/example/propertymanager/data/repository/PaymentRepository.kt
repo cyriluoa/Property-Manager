@@ -85,5 +85,22 @@ class PaymentRepository @Inject constructor(
         )
     }
 
+    fun areAllPaymentsNotPending(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        onResult: (Boolean) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        paymentManager.areAllPaymentsNotPending(
+            propertyId,
+            contractId,
+            payableItemId,
+            onResult,
+            onFailure
+        )
+    }
+
+
 
 }
