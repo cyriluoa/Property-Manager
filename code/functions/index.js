@@ -265,4 +265,73 @@ exports.getClientContracts = functions.https.onCall(async (request) => {
 
 
 
+exports.notifyOwnerOnPayment = onDocumentCreated(
+  "properties/{propertyId}/contracts/{contractId}/payableItems/{payableItemId}/payments/{paymentId}",
+  async (event) => {
+    logger.log("New payment detected.");
+
+    const paymentData = event.data.data();
+    logger.log("Payment data:", paymentData);
+
+    const { amountPaid, ownerId, propertyName, paymentLabel } = paymentData;
+
+    if (!ownerId) {
+      logger.error("Missing ownerId in payment.");
+      return;
+    }
+
+    const ownerDoc = await admin.firestore().collection("users").doc(ownerId).get();
+    const ownerData = ownerDoc.data();
+
+    if (!ownerData || !ownerData.fcmTokens || ownerData.fcmTokens.length === 0) {
+      logger.warn(`No FCM tokens for owner ${ownerId}. Skipping notification.`);
+      return;
+    }
+
+    const tokens = ownerData.fcmTokens;
+    logger.log("Tokens found:", tokens);
+
+    const notificationTitle = "New Payment Received";
+    const notificationBody = `A payment of ${amountPaid} was made to ${propertyName}'s ${paymentLabel}.`;
+
+    const payload = {
+      notification: {
+        title: notificationTitle,
+        body: notificationBody,
+      },
+      data: {
+        paymentId: event.params.paymentId,
+        type: "payment_notification",
+      },
+    };
+
+    const messaging = admin.messaging();
+    const invalidTokens = [];
+
+    for (const token of tokens) {
+      try {
+        const res = await messaging.send({
+          token,
+          notification: payload.notification,
+          data: payload.data,
+        });
+        logger.log(`Notification sent to token ${token}: ${res}`);
+      } catch (err) {
+        logger.error(`Error sending to token ${token}:`, err);
+        invalidTokens.push(token);
+      }
+    }
+
+    if (invalidTokens.length > 0) {
+      logger.log("Removing invalid tokens:", invalidTokens);
+      await admin.firestore().collection("users").doc(ownerId).update({
+        fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens),
+      });
+    }
+  }
+);
+
+
+
+
 

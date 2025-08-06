@@ -14,6 +14,7 @@ import com.example.propertymanager.data.model.PayableItemType
 import com.example.propertymanager.databinding.FragmentPayableItemsBinding
 import com.example.propertymanager.ui.image.ImageSharedViewModel
 import com.example.propertymanager.ui.mainPage.payments.client.payments.MakePaymentFragment
+import com.example.propertymanager.ui.mainPage.payments.client.payments.viewPayments.FragmentPaymentTabs
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -102,13 +103,39 @@ class PayableItemsFragment : Fragment() {
     private fun setupAdapters() {
         monthlyAdapter = PayableItemAdapter(
             mode,
-            onViewPaymentsClicked = { /* handle view */ },
+            onViewPaymentsClicked = { payableItem ->
+                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
+                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
+                } else {
+                    "Month ${payableItem.monthIndex?.plus(1)}'s Rent"
+                }
+
+                val fragment = FragmentPaymentTabs.newInstance(
+                    propertyId = propertyId,
+                    contractId = contractId,
+                    payableItemId = payableItem.id,
+                    propertyName = propertyName,
+                    paymentLabel = label,
+                    clientId = clientId,
+                    ownerId = ownerId
+                )
+
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                    )
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            ,
             onMakePaymentClicked = { payableItem ->
 
                 val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
                     payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
                 } else {
-                    "Month ${payableItem.monthIndex?.plus(1)}"
+                    "Month ${payableItem.monthIndex?.plus(1)}'s Rent"
                 }
 
                 val fragment = MakePaymentFragment.newInstance(
@@ -138,7 +165,33 @@ class PayableItemsFragment : Fragment() {
 
         overdueAdapter = PayableItemAdapter(
             mode,
-            onViewPaymentsClicked = { /* handle view */ },
+            onViewPaymentsClicked = { payableItem ->
+                val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
+                    payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
+                } else {
+                    "Month ${payableItem.monthIndex?.plus(1)}'s Rent"
+                }
+
+                val fragment = FragmentPaymentTabs.newInstance(
+                    propertyId = propertyId,
+                    contractId = contractId,
+                    payableItemId = payableItem.id,
+                    propertyName = propertyName,
+                    paymentLabel = label,
+                    clientId = clientId,
+                    ownerId = ownerId
+                )
+
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right, R.anim.slide_out_left,
+                        R.anim.slide_in_left, R.anim.slide_out_right
+                    )
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+            ,
             onMakePaymentClicked = { payableItem ->
                 val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
                     payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"

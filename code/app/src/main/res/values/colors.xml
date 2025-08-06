@@ -23,4 +23,5 @@
     <color name="error_red">#E74C3C</color>
     <color name="light_gray">#F8F9FA</color>
     <color name="card_background">#FFFFFF</color>
+    <color name="warning_yellow">#FF9800</color>
 </resources>
