@@ -1,6 +1,7 @@
 package com.example.propertymanager.data.firebase
 
 import com.example.propertymanager.data.model.Payment
+import com.example.propertymanager.data.model.PaymentState
 import jakarta.inject.Inject
 import java.util.UUID
 import javax.inject.Singleton
@@ -59,6 +60,85 @@ class PaymentManager @Inject constructor(): FirestoreManager() {
             }
             .addOnFailureListener { e -> onFailure(e) }
     }
+
+
+    // ✅ NEW: Mark Payment as APPROVED
+    fun approvePayment(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        paymentId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val paymentRef = db
+            .collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+            .document(payableItemId)
+            .collection("payments")
+            .document(paymentId)
+
+        paymentRef.update("paymentState", PaymentState.APPROVED.name)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
+
+    // ✅ NEW: Mark Payment as DENIED
+    fun denyPayment(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        paymentId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val paymentRef = db
+            .collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+            .document(payableItemId)
+            .collection("payments")
+            .document(paymentId)
+
+        paymentRef.update("paymentState", PaymentState.DENIED.name)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e) }
+    }
+
+    fun areAllPaymentsNotPending(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        onResult: (Boolean) -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val paymentsRef = db
+            .collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+            .document(payableItemId)
+            .collection("payments")
+
+        paymentsRef.get()
+            .addOnSuccessListener { snapshot ->
+                val hasPending = snapshot.documents.any { doc ->
+                    doc.getString("paymentState") == PaymentState.PENDING.name
+                }
+                onResult(!hasPending) // true if no pending payments
+            }
+            .addOnFailureListener { e ->
+                onFailure(e)
+            }
+    }
+
+
 
 
 

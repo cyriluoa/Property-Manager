@@ -3,6 +3,7 @@ package com.example.propertymanager.data.firebase
 
 import android.util.Log
 import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableItemType
 import com.example.propertymanager.data.model.PayableState
@@ -155,5 +156,122 @@ class PayableItemManager @Inject constructor() : FirestoreManager() {
     }
 
 
+    fun approvePaymentAndUpdateContractIfNeeded(
+        propertyId: String,
+        contractId: String,
+        payableItemId: String,
+        paymentAmount: Double,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val TAG = "approvePayment"
+
+        val contractRef = db.collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+
+        val payableItemsRef = db.collection("properties")
+            .document(propertyId)
+            .collection("contracts")
+            .document(contractId)
+            .collection("payableItems")
+
+        val targetItemRef = payableItemsRef.document(payableItemId)
+
+        Log.d(TAG, "Fetching all payable items...")
+
+        payableItemsRef.get()
+            .addOnSuccessListener { snapshot ->
+                val allItemDocs = snapshot.documents
+
+                Log.d(TAG, "Fetched ${allItemDocs.size} payable items. Starting transaction...")
+
+                db.runTransaction { transaction ->
+                    Log.d(TAG, "Transaction started")
+
+                    // Step 1: Read the target item
+                    val targetSnap = transaction.get(targetItemRef)
+                    val currentItem = targetSnap.toObject(PayableItem::class.java)
+                        ?: throw Exception("PayableItem not found")
+
+                    Log.d(TAG, "Current item: ${currentItem.id}, totalPaid: ${currentItem.totalPaid}, amountDue: ${currentItem.amountDue}")
+
+                    // Step 2: Calculate new totals
+                    val newTotalPaid = currentItem.totalPaid + paymentAmount
+                    val isFullyPaid = newTotalPaid >= currentItem.amountDue
+
+                    var updatedStatus = currentItem.status
+                    if (isFullyPaid) {
+                        updatedStatus = when (currentItem.status) {
+                            PayableState.DUE -> PayableState.PAID
+                            PayableState.OVERDUE -> PayableState.PAID_LATE
+                            else -> currentItem.status
+                        }
+                    }
+
+                    Log.d(TAG, "New total paid: $newTotalPaid, fully paid: $isFullyPaid, new status: $updatedStatus")
+
+                    // Step 3: Check all other items' statuses
+                    var allPaid = true
+                    for ((i, doc) in allItemDocs.withIndex()) {
+                        val id = doc.id
+
+                        if (id == payableItemId) {
+                            // Use the calculated status for this one
+                            Log.d(TAG, "Skipping re-fetch of current item $id; using updated status: $updatedStatus")
+                            if (updatedStatus != PayableState.PAID && updatedStatus != PayableState.PAID_LATE) {
+                                Log.d(TAG, "Item $id is not fully paid (new status = $updatedStatus). Breaking out.")
+                                allPaid = false
+                                break
+                            }
+                            continue
+                        }
+
+                        val ref = payableItemsRef.document(id)
+                        val snap = transaction.get(ref)
+                        val state = snap.getString("status")
+
+                        Log.d(TAG, "Doc #$i ($id) status = $state")
+
+                        if (state != PayableState.PAID.name && state != PayableState.PAID_LATE.name) {
+                            Log.d(TAG, "Item $id is not fully paid. Breaking out.")
+                            allPaid = false
+                            break
+                        }
+                    }
+
+                    Log.d(TAG, "All items fully paid? $allPaid")
+
+                    // Step 4: Perform updates
+                    transaction.update(targetItemRef, mapOf(
+                        "totalPaid" to newTotalPaid,
+                        "isFullyPaid" to isFullyPaid,
+                        "status" to updatedStatus.name
+                    ))
+
+                    Log.d(TAG, "Updated target payable item ${currentItem.id}")
+
+                    if (allPaid) {
+                        transaction.update(contractRef, "contractState", ContractState.COMPLETELY_PAID_OFF.name)
+                        Log.d(TAG, "Updated contract state to COMPLETELY_PAID_OFF")
+                    }
+
+                }.addOnSuccessListener {
+                    Log.d(TAG, "Transaction successful")
+                    onSuccess()
+                }.addOnFailureListener {
+                    Log.e(TAG, "Transaction failed", it)
+                    onFailure(it)
+                }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Failed to fetch payable items before transaction", it)
+                onFailure(it)
+            }
+    }
+
 
 }
+
+

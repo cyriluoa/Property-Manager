@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.propertymanager.R
@@ -32,6 +33,8 @@ class PendingPaymentsFragment : Fragment() {
     private val mode by lazy { Mode.valueOf(requireArguments().getString(ARG_MODE)!!) }
 
     private val sharedViewModel: SharedPaymentsViewModel by activityViewModels()
+
+    private val pendingViewModel: PendingPaymentsViewModel by viewModels()
 
 
 
@@ -72,20 +75,28 @@ class PendingPaymentsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = PaymentAdapter(
             mode = mode,
+            loadingCardIds = pendingViewModel.loadingCards.value ?: emptySet(),
             onApproveClicked = { payment ->
-//                sharedViewModel.updatePaymentState(
-//                    propertyId, contractId, payableItemId, payment.id, PaymentState.APPROVED
-//                )
+                pendingViewModel.approvePayment(propertyId, contractId, payableItemId, payment) { error ->
+                    if (error == null) {
+                        sharedViewModel.refresh(propertyId, contractId, payableItemId)
+                    } else {
+                        Toast.makeText(requireContext(), "Approval failed: ${error.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             },
             onDenyClicked = { payment ->
-//                sharedViewModel.updatePaymentState(
-//                    propertyId, contractId, payableItemId, payment.id, PaymentState.DENIED
-//                )
+                pendingViewModel.denyPayment(propertyId, contractId, payableItemId, payment.id) { error ->
+                    if (error == null) {
+                        sharedViewModel.refresh(propertyId, contractId, payableItemId)
+                    } else {
+                        Toast.makeText(requireContext(), "Denial failed: ${error.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
             },
-            onViewImageClicked = { payment ->
-                showImageDialog(payment.proofUrl)
-            }
+            onViewImageClicked = { payment -> showImageDialog(payment.proofUrl) }
         )
+
 
         binding.rvPending.adapter = adapter
         binding.rvPending.layoutManager = LinearLayoutManager(requireContext())

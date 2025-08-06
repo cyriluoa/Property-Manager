@@ -2,6 +2,7 @@ package com.example.propertymanager.ui.mainPage.properties.yourProperties.contra
 
 
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,6 +42,8 @@ class PayableItemAdapter(
 
             // Visibility logic
             val state = item.status
+            Log.d("PayableItemAdapter",state.name)
+            Log.d("PayableItemAdapter",item.toString())
 
             if (state == PayableState.NOT_APPLIED_YET) {
                 btnViewBills.visibility = View.GONE

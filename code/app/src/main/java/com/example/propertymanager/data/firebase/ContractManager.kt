@@ -1,7 +1,9 @@
 package com.example.propertymanager.data.firebase
 
+import android.util.Log
 import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.ContractState
+import com.example.propertymanager.data.model.PayableState
 import com.google.firebase.Timestamp
 import jakarta.inject.Inject
 import javax.inject.Singleton
@@ -73,5 +75,4 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
                 }
             }
     }
-
 }
