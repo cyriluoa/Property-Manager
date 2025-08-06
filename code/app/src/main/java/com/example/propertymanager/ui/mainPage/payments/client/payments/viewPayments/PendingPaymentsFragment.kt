@@ -75,7 +75,6 @@ class PendingPaymentsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = PaymentAdapter(
             mode = mode,
-            loadingCardIds = pendingViewModel.loadingCards.value ?: emptySet(),
             onApproveClicked = { payment ->
                 pendingViewModel.approvePayment(propertyId, contractId, payableItemId, payment) { error ->
                     if (error == null) {
@@ -98,6 +97,7 @@ class PendingPaymentsFragment : Fragment() {
         )
 
 
+
         binding.rvPending.adapter = adapter
         binding.rvPending.layoutManager = LinearLayoutManager(requireContext())
 
@@ -113,6 +113,11 @@ class PendingPaymentsFragment : Fragment() {
             binding.swipeRefresh.isRefreshing = it
         }
 
+        pendingViewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+            showGlobalLoading(isLoading)
+        }
+
+
         if (sharedViewModel.pendingPayments.value == null)
             sharedViewModel.fetchPayments(propertyId, contractId, payableItemId)
     }
@@ -122,6 +127,18 @@ class PendingPaymentsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    override fun onResume() {
+        super.onResume()
+        sharedViewModel.refresh(propertyId, contractId, payableItemId)
+    }
+
+
+    private fun showGlobalLoading(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        binding.swipeRefresh.isEnabled = !show
+    }
+
 
 
     private fun showImageDialog(imageUrl: String?) {

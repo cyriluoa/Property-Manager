@@ -13,12 +13,11 @@ class PendingPaymentsViewModel @Inject constructor(
     private val paymentRepository: PaymentRepository
 ) : ViewModel() {
 
-    private val _loadingCards = MutableLiveData<Set<String>>(emptySet())
-    val loadingCards: LiveData<Set<String>> = _loadingCards
+    private val _loading = MutableLiveData(false)
+    val loading: LiveData<Boolean> = _loading
 
-    private fun setCardLoading(id: String, isLoading: Boolean) {
-        val current = _loadingCards.value ?: emptySet()
-        _loadingCards.value = if (isLoading) current + id else current - id
+    private fun setLoading(isLoading: Boolean) {
+        _loading.value = isLoading
     }
 
     fun approvePayment(
@@ -28,15 +27,15 @@ class PendingPaymentsViewModel @Inject constructor(
         payment: Payment,
         onComplete: (Exception?) -> Unit
     ) {
-        setCardLoading(payment.id, true)
+        setLoading(true)
         paymentRepository.markPaymentApproved(
             propertyId, contractId, payableItemId, payment.id, payment.amountPaid,
             onSuccess = {
-                setCardLoading(payment.id, false)
+                setLoading(false)
                 onComplete(null)
             },
             onFailure = { error ->
-                setCardLoading(payment.id, false)
+                setLoading(false)
                 onComplete(error)
             }
         )
@@ -49,18 +48,18 @@ class PendingPaymentsViewModel @Inject constructor(
         paymentId: String,
         onComplete: (Exception?) -> Unit
     ) {
-        setCardLoading(paymentId, true)
+        setLoading(true)
         paymentRepository.markPaymentDenied(
             propertyId, contractId, payableItemId, paymentId,
             onSuccess = {
-                setCardLoading(paymentId, false)
+                setLoading(false)
                 onComplete(null)
             },
             onFailure = { error ->
-                setCardLoading(paymentId, false)
+                setLoading(false)
                 onComplete(error)
             }
         )
     }
-
 }
+

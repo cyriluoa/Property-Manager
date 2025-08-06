@@ -16,8 +16,16 @@ class PaymentsPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) 
                 parent.payableItemId,
                 parent.mode
             )
-            1 -> ApprovedPaymentsFragment()
-            else -> DeniedPaymentsFragment()
+            1 -> ApprovedPaymentsFragment.newInstance(
+                parent.propertyId,
+                parent.contractId,
+                parent.payableItemId
+            )
+            else -> DeniedPaymentsFragment.newInstance(
+                parent.propertyId,
+                parent.contractId,
+                parent.payableItemId
+            )
         }
     }
 }

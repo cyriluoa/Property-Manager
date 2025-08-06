@@ -17,7 +17,6 @@ import java.util.Locale
 
 class PaymentAdapter(
     private val mode: Mode,
-    private val loadingCardIds: Set<String> = emptySet(),
     private val onApproveClicked: (Payment) -> Unit,
     private val onDenyClicked: (Payment) -> Unit,
     private val onViewImageClicked: (Payment) -> Unit
@@ -37,7 +36,6 @@ class PaymentAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(payment: Payment) {
-            val isLoading = loadingCardIds.contains(payment.id)
             binding.apply {
                 tvAmountPaid.text = "₹${payment.amountPaid}"
                 tvTimestamp.text = formatDate(payment.timestamp)
@@ -59,10 +57,6 @@ class PaymentAdapter(
 
                 btnViewImage.visibility = if (payment.proofUrl.isNullOrBlank()) View.GONE else View.VISIBLE
 
-                progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-                btnApprove.isEnabled = !isLoading
-                btnDeny.isEnabled = !isLoading
-                btnViewImage.isEnabled = !isLoading
 
                 btnApprove.setOnClickListener { onApproveClicked(payment) }
                 btnDeny.setOnClickListener { onDenyClicked(payment) }
