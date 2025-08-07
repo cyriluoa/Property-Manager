@@ -95,7 +95,8 @@ class PropertyRepository @Inject constructor(
                                         currentClientName = clientName,
                                         dueThisMonth = 0.0,
                                         totalDue = 0.0,
-                                        ownerId = property.ownerId
+                                        ownerId = property.ownerId,
+                                        currentContractId = property.currentContractId
                                     )
                                 )
                                 completed++

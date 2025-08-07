@@ -123,8 +123,8 @@ exports.endExpiredContracts = onSchedule(
       const contract = contractDoc.data();
       logger.log(`📄 Contract ${contractId} retrieved`);
 
-      if (contract.contractState !== "ACTIVE") {
-        logger.log(`⛔ Contract ${contractId} is not ACTIVE (${contract.contractState}). Skipping.`);
+       if (state !== "ACTIVE" && state !== "COMPLETELY_PAID_OFF") {
+        logger.log(`⛔ Contract ${contractId} is ${state}. Skipping.`);
         continue;
       }
 
@@ -136,7 +136,10 @@ exports.endExpiredContracts = onSchedule(
       if (today.isSameOrAfter(endDate)) {
         logger.log(`✅ Ending contract ${contractId}...`);
 
-        await contractRef.update({ contractState: "OVER" });
+        if (state === "ACTIVE") {
+          await contractRef.update({ contractState: "OVER" });
+          logger.log(`📝 Marked contract ${contractId} as OVER`);
+        }
 
         await propertyDoc.ref.update({
           currentContractId: null,

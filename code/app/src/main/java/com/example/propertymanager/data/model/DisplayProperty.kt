@@ -8,6 +8,7 @@ data class DisplayProperty(
     val currentClientName: String,
     val dueThisMonth: Double,
     val totalDue: Double,
-    val ownerId: String
+    val ownerId: String,
+    val currentContractId: String ? = null
 )
 

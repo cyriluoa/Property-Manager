@@ -1,5 +1,6 @@
 package com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -39,31 +40,43 @@ class ContractsFragment : Fragment() {
         requireArguments().getString(ARG_OWNER_ID) ?: error("Owner ID not passed")
     }
 
+    private val currentContractId: String? by lazy {
+        requireArguments().getString(ARG_CURRENT_CONTRACT_ID)
+    }
 
-
+    private val propertyStatus: String by lazy {
+        requireArguments().getString(ARG_PROPERTY_STATUS) ?: error("Property status not passed")
+    }
 
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
         private const val ARG_PROPERTY_NAME = "property_name"
         private const val ARG_OWNER_ID = "owner_id"
+        private const val ARG_CURRENT_CONTRACT_ID = "current_contract_id"
+        private const val ARG_PROPERTY_STATUS = "property_status"
 
-        fun newInstance(propertyId: String, propertyName: String, ownerId: String): ContractsFragment {
+        fun newInstance(
+            propertyId: String,
+            propertyName: String,
+            ownerId: String,
+            currentContractId: String?,
+            propertyStatus: String
+        ): ContractsFragment {
             return ContractsFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PROPERTY_ID, propertyId)
                     putString(ARG_PROPERTY_NAME, propertyName)
                     putString(ARG_OWNER_ID, ownerId)
+                    putString(ARG_CURRENT_CONTRACT_ID, currentContractId)
+                    putString(ARG_PROPERTY_STATUS, propertyStatus)
                 }
             }
         }
     }
 
-
     private lateinit var inactiveAdapter: ContractAdapter
 
     private val onContractClick: (Contract) -> Unit = { selectedContract ->
-        Log.d("ContractsFragment", "View bills clicked for contract: ${selectedContract.id}")
-
         val fragment = PayableItemsFragment.newInstance(
             propertyId = propertyId,
             contractId = selectedContract.id,
@@ -82,9 +95,7 @@ class ContractsFragment : Fragment() {
             .replace(R.id.fragment_container, fragment)
             .addToBackStack(null)
             .commit()
-
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -96,9 +107,15 @@ class ContractsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupSwipeToRefresh()
         setupInactiveRecycler()
-        viewModel.loadContracts(propertyId)
         observeViewModel()
+
+        viewModel.loadContracts(propertyId, currentContractId, propertyStatus)
+
+        binding.fabAddContract.setOnClickListener {
+            // navigate to AddContract screen
+        }
     }
 
     private fun setupInactiveRecycler() {
@@ -109,10 +126,24 @@ class ContractsFragment : Fragment() {
         }
     }
 
+    private fun setupSwipeToRefresh() {
+        binding.swipeRefreshContracts.setOnRefreshListener {
+            viewModel.loadContracts(propertyId, currentContractId, propertyStatus)
+        }
+
+        viewModel.activeContract.observe(viewLifecycleOwner) {
+            binding.swipeRefreshContracts.isRefreshing = false
+        }
+
+        viewModel.inactiveContracts.observe(viewLifecycleOwner) {
+            binding.swipeRefreshContracts.isRefreshing = false
+        }
+    }
+
     private fun observeViewModel() {
         viewModel.activeContract.observe(viewLifecycleOwner) { activeContract ->
             if (activeContract != null) {
-                bindContractToCard(binding.layoutActiveContract, activeContract,onContractClick)
+                bindContractToCard(binding.layoutActiveContract, activeContract, onContractClick)
                 binding.layoutActiveContract.root.visibility = View.VISIBLE
                 binding.tvNoActiveContract.visibility = View.GONE
             } else {
@@ -129,6 +160,10 @@ class ContractsFragment : Fragment() {
                 binding.tvNoInactiveContracts.visibility = View.VISIBLE
             }
         }
+
+        viewModel.canAddContract.observe(viewLifecycleOwner) { canAdd ->
+            binding.fabAddContract.visibility = if (canAdd) View.VISIBLE else View.GONE
+        }
     }
 
     private fun bindContractToCard(
@@ -138,25 +173,32 @@ class ContractsFragment : Fragment() {
     ) {
         cardBinding.tvContractDuration.text = "${contract.startDate} - ${contract.endDate}"
         cardBinding.tvContractLength.text = "${contract.contractLengthMonths} months"
-
-        val createdAtText = contract.createdAt?.let {
+        cardBinding.tvCreatedAt.text = contract.createdAt?.let {
             SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(it.toDate())
         } ?: "N/A"
-        cardBinding.tvCreatedAt.text = createdAtText
-
+        cardBinding.llCancelButton.visibility = View.VISIBLE
         cardBinding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
         cardBinding.tvContractStatus.text = contract.contractState.name
         cardBinding.tvContractStatus.setBackgroundResource(R.drawable.status_badge_green)
 
-        cardBinding.btnViewBills.setOnClickListener {
-            onClick(contract)
+        cardBinding.btnViewBills.setOnClickListener { onClick(contract) }
+
+        cardBinding.btnCancelContract.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setTitle("Cancel Contract")
+                .setMessage("Are you sure you want to cancel this contract?")
+                .setPositiveButton("Yes") { _, _ ->
+                    viewModel.cancelContract(propertyId, contract.id)
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
+
 

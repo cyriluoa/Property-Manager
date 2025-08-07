@@ -47,6 +47,20 @@ class ContractManager  @Inject constructor(): FirestoreManager() {
             .addOnFailureListener { onFailure(it) }
     }
 
+    fun markContractCancelled(propertyId: String, contractId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("properties").document(propertyId)
+            .collection("contracts").document(contractId)
+            .update(
+                mapOf(
+                    "contractState" to ContractState.CANCELLED.name,
+                    "cancelledAt" to Timestamp.now()
+                )
+            )
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
 
 
 

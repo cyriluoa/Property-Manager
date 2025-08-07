@@ -133,21 +133,56 @@
                         android:textSize="14sp"
                         android:textColor="@color/error_red" />
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- View Payments Button -->
-            <Button
-                android:id="@+id/btnViewBills"
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="View Bills"
-                android:textStyle="bold"
-                android:layout_gravity="end"
-                android:backgroundTint="@color/primary_blue"
-                android:textColor="@color/white"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp" />
+                android:paddingHorizontal="12dp"
+                android:paddingBottom="12dp"
+                android:paddingTop="4dp">
+
+                <!-- Cancel Button with Label -->
+                <LinearLayout
+                    android:id="@+id/llCancelButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center_horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnCancelContract"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Cancel Contract"
+                        android:src="@drawable/ic_cancel"
+                        app:tint="@color/error_red" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cancel"
+                        android:textSize="12sp"
+                        android:textColor="@color/error_red"
+                        android:id="@+id/tvCancelLabel" />
+                </LinearLayout>
+
+                <!-- View Bills Button -->
+                <Button
+                    android:id="@+id/btnViewBills"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="View Bills"
+                    android:textStyle="bold"
+                    android:backgroundTint="@color/primary_blue"
+                    android:textColor="@color/white" />
+            </RelativeLayout>
+
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

@@ -44,7 +44,9 @@ class PropertyListFragment : Fragment() {
             val fragment = ContractsFragment.newInstance(
                 propertyId = clickedItem.propertyId,
                 propertyName = clickedItem.propertyName,
-                ownerId = clickedItem.ownerId
+                ownerId = clickedItem.ownerId,
+                propertyStatus = clickedItem.status,
+                currentContractId = clickedItem.currentContractId
             )
 
             parentFragmentManager.beginTransaction()

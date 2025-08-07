@@ -1,86 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/background_light">
 
-        <!-- Header -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="My Contracts"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:padding="16dp"
-            android:background="@drawable/header_gradient_bg"
-            android:elevation="4dp" />
-
-        <ScrollView
+        <!-- Main Content -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Header -->
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="My Contracts"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:padding="16dp"
+                android:background="@drawable/header_gradient_bg"
+                android:elevation="4dp" />
 
-                <!-- Current Active Contracts Section -->
-                <TextView
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshContracts"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Current Active Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary_blue"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
 
-                <include
-                    layout="@layout/item_contract"
-                    android:id="@+id/layoutActiveContract"
-                    android:visibility="gone" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvNoActiveContract"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No current active contract"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    android:paddingBottom="24dp" />
+                        <!-- Active Contracts -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Current Active Contracts"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary_blue"
+                            android:layout_marginBottom="12dp" />
 
-                <!-- Inactive Contracts Section -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Inactive Contracts"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginBottom="12dp" />
+                        <include
+                            layout="@layout/item_contract"
+                            android:id="@+id/layoutActiveContract"
+                            android:visibility="gone" />
 
-                <TextView
-                    android:id="@+id/tvNoInactiveContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="No previous contracts yet"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:visibility="gone" />
+                        <TextView
+                            android:id="@+id/tvNoActiveContract"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No current active contract"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:visibility="gone"
+                            android:paddingBottom="24dp" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvInactiveContracts"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
+                        <!-- Inactive Contracts -->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Inactive Contracts"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_secondary"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:id="@+id/tvNoInactiveContracts"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No previous contracts yet"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"
+                            android:visibility="gone" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvInactiveContracts"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false" />
+                    </LinearLayout>
+                </ScrollView>
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </LinearLayout>
+
+        <!-- Floating Action Button should float above all content -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAddContract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add"
+            android:contentDescription="Add Contract"
+            app:backgroundTint="@color/primary_blue"
+            app:tint="@color/white"/>
+    </FrameLayout>
 </layout>
