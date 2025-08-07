@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.propertymanager.R
 import com.example.propertymanager.databinding.ItemContractBinding
 import com.example.propertymanager.data.model.Contract
+import com.example.propertymanager.data.model.ContractState
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,10 +34,12 @@ class ContractAdapter(
 
             binding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
 
-            val badgeRes = when (contract.contractState.name) {
-                "ACTIVE" -> R.drawable.status_badge_yellow
-                "OVER" -> R.drawable.status_badge_yellow
-                "CANCELLED" -> R.drawable.status_badge_yellow
+            Log.d("ContractAdapter", "State = ${contract.contractState}")
+
+            val badgeRes = when (contract.contractState) {
+                ContractState.ACTIVE , ContractState.ACCEPTED, ContractState.COMPLETELY_PAID_OFF -> R.drawable.status_badge_green
+                ContractState.PENDING -> R.drawable.status_badge_yellow
+                ContractState.CANCELLED, ContractState.OVER, ContractState.DENIED, ContractState.NOT_ACCEPTED_IN_TIME -> R.drawable.status_badge_red
                 else -> R.drawable.status_badge_yellow
             }
 

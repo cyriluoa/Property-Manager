@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.propertymanager.R
 import com.example.propertymanager.data.model.ClientPropertyContract
+import com.example.propertymanager.data.model.ContractState
+import com.example.propertymanager.data.model.PaymentState
 import com.example.propertymanager.databinding.ItemClientPropertyContractCardBinding
 
 class ClientPropertiesAdapter(
@@ -37,8 +39,8 @@ class ClientPropertiesAdapter(
             tvPropertyName.text = contract.propertyName
             tvContractStatus.text = contract.contractState.name
 
-            // Badge background could be dynamic if needed:
-            // tvContractStatus.setBackgroundResource(getBadgeDrawable(contract.contractState))
+
+            tvContractStatus.setBackgroundResource(getStatusBadge(contract.contractState))
 
             tvOwnerName.text = contract.ownerName
             tvStartDate.text = contract.startDate
@@ -61,6 +63,15 @@ class ClientPropertiesAdapter(
 
             binding.btnViewBills.setOnClickListener {
                 onViewBillsClick(contract)
+            }
+        }
+
+
+        private fun getStatusBadge(state: ContractState): Int {
+            return when (state) {
+                ContractState.PENDING -> R.drawable.status_badge_yellow
+                ContractState.ACTIVE, ContractState.ACCEPTED, ContractState.COMPLETELY_PAID_OFF ->  R.drawable.status_badge_green
+                ContractState.DENIED, ContractState.OVER, ContractState.CANCELLED, ContractState.NOT_ACCEPTED_IN_TIME -> R.drawable.status_badge_red
             }
         }
     }

@@ -4,7 +4,7 @@ data class DisplayProperty(
     val propertyId: String,
     val propertyName: String,
     val imageUrl: String?,
-    val status: String, // e.g. "PENDING", "OCCUPIED", "VACANT"
+    val status: String, // e.g.  "OCCUPIED", "VACANT"
     val currentClientName: String,
     val dueThisMonth: Double,
     val totalDue: Double,

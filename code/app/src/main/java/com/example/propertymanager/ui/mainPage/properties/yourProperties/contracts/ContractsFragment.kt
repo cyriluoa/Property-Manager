@@ -145,6 +145,7 @@ class ContractsFragment : Fragment() {
 
         cardBinding.tvOverdueItems.text = "${contract.preContractOverdueAmounts.size} items"
         cardBinding.tvContractStatus.text = contract.contractState.name
+        cardBinding.tvContractStatus.setBackgroundResource(R.drawable.status_badge_green)
 
         cardBinding.btnViewBills.setOnClickListener {
             onClick(contract)

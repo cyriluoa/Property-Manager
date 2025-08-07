@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.propertymanager.R
+import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.data.model.DisplayProperty
+import com.example.propertymanager.data.model.PropertyState
 import com.example.propertymanager.databinding.ItemPropertyCardBinding
 
 class PropertyListAdapter(
@@ -24,6 +27,8 @@ class PropertyListAdapter(
             tvAmountDueMonth.text = "$${item.dueThisMonth}"
             tvTotalAmountDue.text = "$${item.totalDue}"
 
+            tvPropertyStatus.setBackgroundResource(getStatusBadge(item.status))
+
             if (!item.imageUrl.isNullOrEmpty()) {
                 ivPropertyImage.visibility = View.VISIBLE
                 Glide.with(root.context).load(item.imageUrl).into(ivPropertyImage)
@@ -33,6 +38,15 @@ class PropertyListAdapter(
             }
 
             btnContracts.setOnClickListener { onClick(item) }
+        }
+
+        private fun getStatusBadge(state: String): Int {
+            return when (state) {
+                PropertyState.VACANT.toString() -> R.drawable.status_badge_yellow
+                PropertyState.OCCUPIED.toString() ->  R.drawable.status_badge_green
+                else -> R.drawable.status_badge_red
+
+            }
         }
     }
 

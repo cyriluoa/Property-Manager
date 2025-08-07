@@ -1,11 +1,14 @@
 package com.example.propertymanager.ui.mainPage.requests
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.propertymanager.R
 import com.example.propertymanager.data.model.ClientRequest
+import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.databinding.ItemRequestBinding
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -41,7 +44,21 @@ class ClientRequestAdapter(
             binding.btnViewContract.setOnClickListener {
                 onItemClicked(request)
             }
+
+            Log.d("ClientRequestAdapter",request.status)
+
+            val badgeRes = when (request.status) {
+                "accepted" -> R.drawable.status_badge_green
+                "pending" -> R.drawable.status_badge_yellow
+                "denied"-> R.drawable.status_badge_red
+                else -> R.drawable.status_badge_red
+            }
+
+            binding.tvStatus.setBackgroundResource(badgeRes)
+
         }
+
+
 
         private fun formatTimestamp(timestamp: Timestamp): String {
             val sdf = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())

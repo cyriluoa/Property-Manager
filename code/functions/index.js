@@ -332,6 +332,86 @@ exports.notifyOwnerOnPayment = onDocumentCreated(
 );
 
 
+exports.notifyClientOnPaymentStatusChange = onDocumentUpdated(
+  "properties/{propertyId}/contracts/{contractId}/payableItems/{payableItemId}/payments/{paymentId}",
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+
+    if (!before || !after) {
+      logger.warn("Missing document data before or after update.");
+      return;
+    }
+
+    const statusChanged = before.paymentState === "PENDING" &&
+      (after.paymentState === "APPROVED" || after.paymentState === "DENIED");
+
+    if (!statusChanged) {
+      logger.log("Payment state did not change from PENDING to APPROVED or DENIED. Skipping notification.");
+      return;
+    }
+
+    const { clientId, amountPaid, propertyName, paymentLabel, paymentState } = after;
+
+    if (!clientId) {
+      logger.error("Missing clientId in payment document.");
+      return;
+    }
+
+    const clientDoc = await admin.firestore().collection("users").doc(clientId).get();
+    const clientData = clientDoc.data();
+
+    if (!clientData || !clientData.fcmTokens || clientData.fcmTokens.length === 0) {
+      logger.warn(`No FCM tokens for client ${clientId}. Skipping notification.`);
+      return;
+    }
+
+    const tokens = clientData.fcmTokens;
+    logger.log("Client FCM tokens:", tokens);
+
+    const notificationTitle = "Payment Status Updated";
+    const notificationBody = `Your payment of ${amountPaid} for ${propertyName}'s ${paymentLabel} was ${paymentState.toLowerCase()}.`;
+
+    const payload = {
+      notification: {
+        title: notificationTitle,
+        body: notificationBody,
+      },
+      data: {
+        paymentId: event.params.paymentId,
+        type: "payment_status_update",
+        status: paymentState,
+      },
+    };
+
+    const messaging = admin.messaging();
+    const invalidTokens = [];
+
+    for (const token of tokens) {
+      try {
+        const res = await messaging.send({
+          token,
+          notification: payload.notification,
+          data: payload.data,
+        });
+        logger.log(`Notification sent to client token ${token}: ${res}`);
+      } catch (err) {
+        logger.error(`Error sending notification to token ${token}:`, err);
+        invalidTokens.push(token);
+      }
+    }
+
+    if (invalidTokens.length > 0) {
+      logger.log("Removing invalid client tokens:", invalidTokens);
+      await admin.firestore().collection("users").doc(clientId).update({
+        fcmTokens: admin.firestore.FieldValue.arrayRemove(...invalidTokens),
+      });
+    }
+  }
+);
+
+
+
 
 
 
