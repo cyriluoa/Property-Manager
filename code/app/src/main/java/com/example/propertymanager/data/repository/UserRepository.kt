@@ -26,6 +26,13 @@ class UserRepository @Inject constructor(
         userManager.getUsernameByUid(uid, onSuccess, onFailure)
     }
 
+    fun getCurrentUsernameByUid(
+        onSuccess: (String) -> Unit,
+        onFailure: (Exception) -> Unit
+    ){
+        getUsernameByUid(getCurrentUserUid()?:"",onSuccess,onFailure)
+    }
+
 
 
 
@@ -69,6 +76,10 @@ class UserRepository @Inject constructor(
         onFailure: (Exception) -> Unit
     ) {
         userManager.getAllUsers(onSuccess, onFailure)
+    }
+
+    fun getCurrentUserUid():String?{
+        return userManager.getCurrentUserUid()
     }
 
 }

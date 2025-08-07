@@ -133,6 +133,43 @@ class PropertyRepository @Inject constructor(
         }, onError)
     }
 
+    fun updatePropertyWithNewContractAndSendOutClientRequest(
+        propertyId: String,
+        ownerId: String,
+        contract: Contract,
+        clientRequest: ClientRequest,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        // Step 1: Create contract under this property
+        contractManager.createContract(propertyId, contract, {
+            // Step 2: Create payable items (monthly + overdue)
+            payableItemManager.createAllPayableItems(property = Property(id = propertyId, ownerId = ownerId), contract = contract, {
+                // Step 3: Update property.currentContractId
+                propertyManager.updateCurrentContractId(propertyId, contract.id, {
+                    // Step 4: Create client request
+                    clientRequestManager.createClientRequest(clientRequest, {
+                        onSuccess()
+                    }, { err4 ->
+                        // Rollback only currentContractId and contract? (Cannot delete contract safely if payable items already committed)
+                        onFailure(err4)
+                    })
+                }, { err3 ->
+                    // Rollback contract if property update fails
+                    contractManager.deleteContract(propertyId, contract.id)
+                    onFailure(err3)
+                })
+            }, { err2 ->
+                // Rollback contract if payable items fail
+                contractManager.deleteContract(propertyId, contract.id)
+                onFailure(err2)
+            })
+        }, { err1 ->
+            onFailure(err1)
+        })
+    }
+
+
     fun fetchClientPropertyContracts(
         onComplete: (List<ClientPropertyContract>) -> Unit,
         onError: (Exception) -> Unit

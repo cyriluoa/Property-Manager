@@ -14,6 +14,7 @@ import com.example.propertymanager.data.model.Contract
 import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.databinding.FragmentContractsBinding
 import com.example.propertymanager.databinding.ItemContractBinding
+import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.add.AddContractFragment
 import com.example.propertymanager.ui.mainPage.properties.yourProperties.contracts.payableItems.PayableItemsFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
@@ -114,7 +115,14 @@ class ContractsFragment : Fragment() {
         viewModel.loadContracts(propertyId, currentContractId, propertyStatus)
 
         binding.fabAddContract.setOnClickListener {
-            // navigate to AddContract screen
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right, R.anim.slide_out_left,
+                    R.anim.slide_in_left, R.anim.slide_out_right
+                )
+                .replace(R.id.fragment_container, AddContractFragment.newInstance(propertyId,propertyName,ownerId))
+                .addToBackStack(null)
+                .commit()
         }
     }
 

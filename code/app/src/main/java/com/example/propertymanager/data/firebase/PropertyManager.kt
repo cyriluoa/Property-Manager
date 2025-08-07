@@ -128,8 +128,4 @@ class PropertyManager  @Inject constructor(): FirestoreManager(){
 
 
 
-
-
-
-
 }

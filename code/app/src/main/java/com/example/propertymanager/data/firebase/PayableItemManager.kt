@@ -71,6 +71,8 @@ class PayableItemManager @Inject constructor() : FirestoreManager() {
                 dateFormat.format(cal.time)
             }
 
+
+
             val item = PayableItem(
                 id = itemId,
                 type = PayableItemType.MONTHLY,

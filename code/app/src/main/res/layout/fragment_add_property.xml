@@ -34,6 +34,7 @@
                     app:tint="@color/white" />
 
                 <TextView
+                    android:id="@+id/tv_header"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Add Property"
@@ -43,6 +44,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <TextView
+                    android:id="@+id/tv_greeting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Add new property to your portfolio"
@@ -70,7 +72,6 @@
                     android:gravity="center"
                     android:layout_marginBottom="24dp"
                     android:background="@drawable/dashed_border"
-
                     android:foreground="?android:attr/selectableItemBackground">
 
                     <ImageView
@@ -96,6 +97,7 @@
 
                 <!-- Property Name Input -->
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPropertyName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
