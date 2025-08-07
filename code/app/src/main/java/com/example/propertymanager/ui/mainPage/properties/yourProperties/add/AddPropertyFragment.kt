@@ -38,9 +38,7 @@ class AddPropertyFragment : Fragment() {
     private val binding get() = _binding!!
     private val sharedViewModel: SharedPropertyViewModel by activityViewModels()
     private var selectedStartDate: LocalDate? = null
-
     private val imageSharedViewModel: ImageSharedViewModel by activityViewModels()
-
 
 
     override fun onCreateView(

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableState
@@ -19,6 +20,7 @@ import java.util.*
 
 class PayableItemAdapter(
     private val mode: Mode,
+    private val contractState: String,
     private val onViewPaymentsClicked: (PayableItem) -> Unit,
     private val onMakePaymentClicked: (PayableItem) -> Unit
 ) : ListAdapter<PayableItem, PayableItemAdapter.PayableViewHolder>(DiffCallback()) {
@@ -51,7 +53,7 @@ class PayableItemAdapter(
             } else {
                 btnViewBills.visibility = View.VISIBLE
 
-                if (mode == Mode.CLIENT_MODE) {
+                if (mode == Mode.CLIENT_MODE && contractState == ContractState.ACTIVE.name || contractState == ContractState.OVER.name) {
                     btnMakePayment.visibility = when (state) {
                         PayableState.DUE, PayableState.OVERDUE -> View.VISIBLE
                         else -> View.GONE

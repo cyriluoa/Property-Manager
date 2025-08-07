@@ -70,7 +70,8 @@ class ContractsFragment : Fragment() {
             mode = Mode.OWNER_MODE,
             ownerId = ownerId,
             clientId = selectedContract.clientId,
-            propertyName = propertyName
+            propertyName = propertyName,
+            contractState = selectedContract.contractState
         )
 
         parentFragmentManager.beginTransaction()

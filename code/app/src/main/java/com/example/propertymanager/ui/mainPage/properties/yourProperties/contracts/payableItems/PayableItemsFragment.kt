@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.propertymanager.R
+import com.example.propertymanager.data.model.ContractState
 import com.example.propertymanager.data.model.Mode
 import com.example.propertymanager.data.model.PayableItem
 import com.example.propertymanager.data.model.PayableItemType
@@ -55,6 +56,13 @@ class PayableItemsFragment : Fragment() {
         requireArguments().getString(ARG_PROPERTY_NAME) ?: error("Missing propertyName")
     }
 
+    private val contractState: String by lazy {
+        requireArguments().getString(ARG_CONTRACT_STATE) ?: error("Missing contractState")
+    }
+
+
+
+
 
     companion object {
         private const val ARG_PROPERTY_ID = "property_id"
@@ -64,13 +72,16 @@ class PayableItemsFragment : Fragment() {
         private const val ARG_CLIENT_ID = "client_id"
         private const val ARG_PROPERTY_NAME = "property_name"
 
+        private const val ARG_CONTRACT_STATE = "contract_state"
+
         fun newInstance(
             propertyId: String,
             contractId: String,
             mode: Mode,
             ownerId: String,
             clientId: String,
-            propertyName: String
+            propertyName: String,
+            contractState: ContractState
         ): PayableItemsFragment {
             return PayableItemsFragment().apply {
                 arguments = Bundle().apply {
@@ -80,6 +91,7 @@ class PayableItemsFragment : Fragment() {
                     putString(ARG_OWNER_ID, ownerId)
                     putString(ARG_CLIENT_ID, clientId)
                     putString(ARG_PROPERTY_NAME, propertyName)
+                    putString(ARG_CONTRACT_STATE, contractState.name)
                 }
             }
         }
@@ -105,6 +117,7 @@ class PayableItemsFragment : Fragment() {
     private fun setupAdapters() {
         monthlyAdapter = PayableItemAdapter(
             mode,
+            contractState,
             onViewPaymentsClicked = { payableItem ->
                 val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
                     payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
@@ -141,6 +154,7 @@ class PayableItemsFragment : Fragment() {
 
         overdueAdapter = PayableItemAdapter(
             mode,
+            contractState,
             onViewPaymentsClicked = { payableItem ->
                 val label = if (payableItem.type == PayableItemType.PRE_CONTRACT_OVERDUE) {
                     payableItem.overdueItemLabel ?: "Pre Contract - Overdue Item"
